@@ -1,3 +1,4 @@
+"use strict"
 var express = require('express')
 var bodyParser = require('body-parser')
 var router = express.Router()
@@ -16,14 +17,12 @@ var data = [
 
 /**
    * @param {{e.RequestHandler}} jsonParser
-   * @param {{changes:Array<ChangeArgs>, source:String}} req.body
+   * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  var tmp = req.body.changes
-  data[tmp[0][0]][tmp[0][1]]=tmp[0][3];
-  console.log('temp', temp)
-
-  res.json({'data': tmp})
+  var change = req.body.changes[0];
+  data[change.row][change.column] = change.newValue;
+  res.json({'data': change})
 })
 
 router.get('/data', function (req, res, next) {
