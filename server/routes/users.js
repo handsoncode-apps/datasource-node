@@ -20,9 +20,16 @@ var data = [
    * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  var change = req.body.changes[0];
+  let change = req.body.changes[0];
   data[change.row][change.column] = change.newValue;
   res.json({'data': change})
+})
+
+router.post('/aftercreaterow', jsonParser, function (req, res, next) {
+  let createRow = req.body
+  for (let i = 0; i < createRow.amount; i++) {
+    data.splice(req.body.index, 0, [])
+  }
 })
 
 router.get('/data', function (req, res, next) {
