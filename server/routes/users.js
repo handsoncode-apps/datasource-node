@@ -28,7 +28,14 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
   let createRow = req.body
   for (let i = 0; i < createRow.amount; i++) {
-    data.splice(req.body.index, 0, [])
+    data.splice(createRow.index, 0, [])
+  }
+})
+
+router.post('/aftercreatecol', jsonParser, function (req, res, next) {
+  let createCol = req.body
+  for (let i = 0; i < data.length; i++) {
+    data[i].splice([createCol.index], 0, '')
   }
 })
 
