@@ -1,0 +1,14 @@
+.DS_Store
+
+client/node_modules/
+server/node_modules/
+
+*.orig
+generator/node_modules/
+/client/package.json
+/client/package-lock.json
+/generator/package.json
+/generator/package-lock.json
+/package-lock.json
+/server/package.json
+/server/package-lock.json

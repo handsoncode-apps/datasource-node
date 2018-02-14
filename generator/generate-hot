@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+'use strict'
+
+const fs = require('fs')
+
+let code = `var express = require('express')
+var bodyParser = require('body-parser')
+var router = express.Router()
+
+// create application/json parser
+var jsonParser = bodyParser.json()
+
+/**
+   * @param {{e.RequestHandler}} jsonParser
+   * @param {{changes:Array<Array<int>>, source:String}} req.body
+   */
+router.post('/afterchange', jsonParser, function (req, res, next) {
+
+  // TODO: implement here
+  res.json({'status': 'OK'})
+})
+
+module.exports = router
+`
+
+let generate = (name) => {
+  if (name !== '') {
+    fs.writeFile('routes/'+ name + '.js', code, (err) => {
+      if (err) {
+        console.log('Can not create file')
+        program.exit(-1)
+      } else {
+        console.log('Sucessed')
+      }
+    })
+  }
+}
+
+const program = require('commander')
+program
+  .version('0.0.1')
+  .description('Generate express js hot controller')
+  .action(generate)
+
+program
+  .parse(process.argv)
+
