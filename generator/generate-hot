@@ -25,7 +25,7 @@ module.exports = router
 
 let generate = (name) => {
   if (name !== '') {
-    fs.writeFile('routes/'+ name + '.js', code, (err) => {
+    fs.writeFile('../server/routes/'+ name + '.js', code, (err) => {
       if (err) {
         console.log('Can not create file')
         program.exit(-1)
