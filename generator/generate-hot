@@ -14,9 +14,9 @@ var jsonParser = bodyParser.json()
    * @param {{e.RequestHandler}} jsonParser
    * @param {{changes:Array<Array<int>>, source:String}} req.body
    */
-router.post('/afterchange', jsonParser, function (req, res, next) {
+  router.post('/aftercreatecol', jsonParser, function (req, res, next) {
 
-  // TODO: implement here
+  // TODO: If you want to use this method implement your code here
   res.json({'status': 'OK'})
 })
 
