@@ -6,24 +6,29 @@ Node.js data source for your Handsontable. Works great with datasource-connector
 2. [Plugin](#plugin)
 3. [Methods](#methods)
     1. [afterChange](#afterChange)
-    2. [afterCreatecol](#afterCreatecol)
+    2. [afterCreatecCl](#afterCreateCol)
     3. [afterCreateRow](#afterCreateRow)
 4. [Use of generator](#generator)
 
-## Introduction <a name="introduction"></a>
+## Introduction<a name="introduction"></a>
 
-## Plugin <a name="plugin"></a>
+## Plugin<a name="plugin"></a>
 
 ## Methods <a name="methods"></a>
-You can use several methods shown below by implementing code to your controller or generating it by generate-hot
 
-### <span style="color:#00d8ff">afterChange</span> <a name="afterChange"></a>
+Please click on choosen method to see the usage.
 
-
-### <span style="color:#00d8ff">afterCreatecol</span> <a name="afterCreatecol"></a>
+### [afterChange](./doc/afterChange.md)<a name="afterChange"></a>
 
 
-### <span style="color:#00d8ff">afterCreateRow</span> <a name="afterCreateRow"></a>
+### [afterCreateCol](./doc/afterCreateCol.md)<a name="afterCreateCol"></a>
+
+
+### [afterCreateRow](./doc/afterCreateRow.md) <a name="afterCreateRow"></a>
 
 
 ## Use of generator <a name="generator"></a>
+
+You can create controller in your routes directory using [generator-hot](./doc/generator-hot.md).
+
+
