@@ -1,12 +1,17 @@
-To use this metod plese insert your code in TODO section in your controller.
+#afterChange event handling 
+
+To use this method plese insert into your controller.
 Exemple code is shown below:
 
-```
+```javascript
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  let change = req.body.changes[0];
-  data[change.row][change.column] = change.newValue;
-  res.json({'data': change})
+  let change = req.body;
+
+  // TODO  insert implementation here
+  res.json({'data': 'ok'})
 })
 
 ```
-You can use generator-hot to automaticly add section.
+
+change {row:number, column:number, oldValue:any, newValue:any}
+is an object that you get after changing value in HOT table cell.
