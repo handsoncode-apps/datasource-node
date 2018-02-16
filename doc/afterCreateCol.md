@@ -1,4 +1,4 @@
-#afterCtreateCol event handling
+# afterCtreateCol event handling
 
 To use this metod plese implement in your controller.
 Exemple code is shown below:

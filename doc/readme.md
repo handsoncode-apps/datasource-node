@@ -12,10 +12,11 @@
 
 ## Plugin
 
-TODO: reference to plugin documentation  
+See the reference [here](TODO url to datasourceConnectorPlugin.md)  
 
 ## Publishing data 
-TODO: here link to doc about how to send data for plugin to show 
+
+See the reference [here](./data.md)
 
 ## Event handling
 
@@ -35,4 +36,4 @@ To handle Hot event in your server-side application you may to implement corresp
 
 ## Use of generator
 
-You can create controller in your routes directory using [generator-hot](./doc/generator-hot.md).
+You can create controller in your routes directory using [datasource-node-generator](./doc/datasource-node-generator.md).

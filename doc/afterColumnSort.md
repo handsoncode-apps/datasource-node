@@ -1,4 +1,4 @@
-#afterColumnSort event handling
+# afterColumnSort event handling
 
 To use this method plese insert into your controller.
 Exemple code is shown below:
