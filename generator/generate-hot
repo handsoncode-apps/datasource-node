@@ -21,6 +21,14 @@ var jsonParser = bodyParser.json()
 })
 
 /**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
+   */
+router.post('/afterchange', jsonParser, function (req, res, next) {
+
+  // TODO: If you want to use this method implement your code here
+
+/**
    * @param {{e.RequestHandler}} jsonParser
    * @param {{changes:Array<Array<int>>, source:String}} req.body
    */
@@ -35,12 +43,12 @@ module.exports = router
 
 let generate = (name) => {
   if (name !== '') {
-    fs.writeFile('routes/'+ name + '.js', code, (err) => {
+    fs.writeFile('../server/routes/'+ name + '.js', code, (err) => {
       if (err) {
         console.log('Can not create file')
         program.exit(-1)
       } else {
-        console.log('Sucessed')
+        console.log('File has been created in routes folder')
       }
     })
   }
