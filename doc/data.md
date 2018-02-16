@@ -11,6 +11,7 @@ router.get('/data', function (req, res, next) {
 example of data format is 
 
 ```javascript
+
 var data = [
   ['', 'Tesla', 'Nissan', 'Toyota', 'Honda', 'Mazda', 'Ford'],
   ['2017', 10, 11, 11, 15, 15, 16],
@@ -20,3 +21,4 @@ var data = [
   ['2021', 10, 11, 15, 11, 15, 16]
 ];
 ```
+Data is an array of arrays. Each array is a row where values begins on index 0 and represents subsequent columns.
