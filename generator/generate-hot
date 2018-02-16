@@ -20,6 +20,16 @@ var jsonParser = bodyParser.json()
   res.json({'status': 'OK'})
 })
 
+/**
+   * @param {{e.RequestHandler}} jsonParser
+   * @param {{changes:Array<Array<int>>, source:String}} req.body
+   */
+  router.post('/aftercreaterow', jsonParser, function (req, res, next) {
+
+  // TODO: If you want to use this method implement your code here
+  res.json({'status': 'OK'})
+})
+
 module.exports = router
 `
 
