@@ -59,10 +59,10 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
     tempColIndexes.sort(function(left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
-    temp = [];
+    let temp = [];
     for (var j in tempColIndexes) {
-        temp.push(tempColIndexes[j][0]);
-        indexes.push(tempColIndexes[j][1]);
+      temp.push(tempColIndexes[j][0]);
+      indexes.push(tempColIndexes[j][1]);
     }
   } else if (!tmp.order) {
     let tempColIndexes = [];
