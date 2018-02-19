@@ -4,8 +4,8 @@ client/node_modules/
 server/node_modules/
 
 *.orig
-generator/node_modules/
+example/node_modules/
 /client/package-lock.json
-/generator/package-lock.json
+/example/package-lock.json
 /package-lock.json
 /server/package-lock.json
