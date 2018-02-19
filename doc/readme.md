@@ -1,6 +1,7 @@
 # Table of contents
 1. [Introduction](#introduction)
 2. [Plugin](#plugin)
+3. [Publishing data](#publishing-data)
 3. [Event handling](#event-handling)
     1. [afterChange](#afterChange)
     2. [afterCreateCol](#afterCreateCol)
@@ -10,9 +11,12 @@
 
 ## Introduction 
 
-## Plugin
+To use this plugin you should have [Handsontable](https://handsontable.com/download) installed.
 
-See the reference [here](TODO url to datasourceConnectorPlugin.md)  
+## Plugin
+This plugin allows to send requests to your custom backend server handling described [events](https://github.com/handsoncode-apps/datasource-node/tree/master/doc#event-handling).
+
+See the reference [here](https://github.com/handsoncode-apps/datasource-connector/blob/master/doc/datasourceConnectorPlugin.md)  
 
 ## Publishing data 
 
