@@ -1,8 +1,9 @@
 # afterChange event handling 
 
-To use this method plese insert into your controller.
-Exemple code is shown below:
+You need to create method that will catch the POST "/afterchange" url with body param `change` object, and should return `200` OK HTTP response. 
 
+
+Express.js example : 
 ```javascript
 router.post('/afterchange', jsonParser, function (req, res, next) {
   let change = req.body;
@@ -13,5 +14,18 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
 
 ```
 
-change {row:number, column:number, oldValue:any, newValue:any}
-is an object that you get after changing value in HOT table cell.
+`change` is object defined by this schema:
+
+```javascript 
+{
+  changes:[
+   { 
+     row:number, 
+     column:any, 
+     oldValue:any, 
+     newValue:any
+   }
+  ],
+  source: string
+ }
+```
