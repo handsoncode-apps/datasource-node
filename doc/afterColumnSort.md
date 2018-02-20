@@ -1,7 +1,6 @@
 # afterColumnSort event handling
 
-To use this method plese insert into your controller.
-Exemple code is shown below:
+You need to create method that will catch the POST "/aftercolumnsort" url with body param `tmp` object, and should return `200` OK HTTP response. 
 
 ```javascript
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
@@ -11,4 +10,13 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
   res.json({'data': 'ok'})
 })
 ```
-tmp is an object {column:number, order:boolean} that you get after sorting columns.
+
+`tmp` is an object defined by schema:
+
+```javascript 
+
+   { 
+     column:any,
+     order:boolean
+   }
+```

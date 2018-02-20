@@ -1,7 +1,6 @@
-# afterCreateRow event Handling
+# afterCreateRow event handling
 
-To use this metod plese implement in your controller.
-Exemple code is shown below:
+You need to create method that will catch the POST "/aftercreaterow" url with body param `createRow` object, and should return `200` OK HTTP response. 
 
 ```javascript
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
@@ -12,4 +11,12 @@ router.post('/aftercreaterow', jsonParser, function (req, res, next) {
   }
 })
 ```
-createRow {index:number, amount:number, source:string} is an object that you get after adding new rows in source HOT table.
+`createRow` is object defined by this schema:
+
+```javascript
+{
+  index:number,
+  amount:number,
+  source:string
+}
+``` 
