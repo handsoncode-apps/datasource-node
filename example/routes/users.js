@@ -37,21 +37,22 @@ var dataAtBeginning = data
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
   let change = req.body.changes[0];
-  data[change.row][change.column] = change.newValue;
+  data[change.row].values[change.column] = change.newValue;
   res.json({ 'data': change })
 })
 
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
   let createRow = req.body
   for (let i = 0; i < createRow.amount; i++) {
-    data.splice(createRow.index, 0, [])
+    data.splice(createRow.index, 0, { key: '', values: [] })
   }
 })
 
 router.post('/aftercreatecol', jsonParser, function (req, res, next) {
   let createCol = req.body
+  colNames.splice(createCol.index, 0, '')
   for (let i = 0; i < data.length; i++) {
-    data[i].splice([createCol.index], 0, '')
+    data[i].values.splice([createCol.index], 0, '')
   }
 })
 
