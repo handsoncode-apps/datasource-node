@@ -7,13 +7,28 @@ var router = express.Router()
 var jsonParser = bodyParser.json()
 
 var data = [
-  ['', 'Tesla', 'Nissan', 'Toyota', 'Honda', 'Mazda', 'Ford'],
-  ['2017', 10, 11, 11, 15, 15, 16],
-  ['2018', 13, 11, 12, 14, 15, 16],
-  ['2019', 10, 11, 13, 9, 15, 16],
-  ['2020', 10, 11, 14, 12, 15, 16],
-  ['2021', 10, 11, 15, 11, 15, 16]
+  { 
+    key: 5,
+    values: ['2017', 10, 11, 11, 15, 15, 16]
+  },
+  { 
+    key: 7,
+    values: ['2018', 13, 11, 12, 14, 15, 16]
+  },
+  { 
+    key: 11,
+    values: ['2019', 10, 11, 13, 9, 15, 16]
+  },
+  { 
+    key: 13,
+    values: ['2020', 10, 11, 14, 12, 15, 16]
+  },
+  { 
+    key: 15,
+    values: ['2020', 10, 11, 14, 12, 15, 16]
+  }
 ];
+var colNames = ['year', 'Tesla', 'Nissan', 'Toyota', 'Honda', 'Mazda', 'Ford']
 var dataAtBeginning = data
 
 /**
@@ -41,7 +56,8 @@ router.post('/aftercreatecol', jsonParser, function (req, res, next) {
 })
 
 router.get('/data', function (req, res, next) {
-  res.json(data)
+  res.json({data: data, columns: colNames})
+  console.log(data)  
 })
 
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
@@ -72,7 +88,7 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
     tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
-    temp = [];
+    var temp = [];
     for (var j in tempColIndexes) {
       temp.push(tempColIndexes[j][0]);
       indexes.push(tempColIndexes[j][1]);
