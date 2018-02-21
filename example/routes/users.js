@@ -23,7 +23,7 @@ var dataAtBeginning = data
 router.post('/afterchange', jsonParser, function (req, res, next) {
   let change = req.body.changes[0];
   data[change.row][change.column] = change.newValue;
-  res.json({'data': change})
+  res.json({ 'data': change })
 })
 
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
@@ -48,15 +48,15 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
   let tmp = req.body
   let tempCol = [];
   let indexes = [];
-  for (let i=0; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
     tempCol.push(data[i][tmp.column])
   }
   if (tmp.order) {
     let tempColIndexes = [];
     for (var i in tempCol) {
-        tempColIndexes.push([tempCol[i], i]);
+      tempColIndexes.push([tempCol[i], i]);
     }
-    tempColIndexes.sort(function(left, right) {
+    tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
     let temp = [];
@@ -67,27 +67,27 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
   } else if (!tmp.order) {
     let tempColIndexes = [];
     for (var i in tempCol) {
-        tempColIndexes.push([tempCol[i], i]);
+      tempColIndexes.push([tempCol[i], i]);
     }
-    tempColIndexes.sort(function(left, right) {
+    tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
     temp = [];
     for (var j in tempColIndexes) {
-        temp.push(tempColIndexes[j][0]);
-        indexes.push(tempColIndexes[j][1]);
+      temp.push(tempColIndexes[j][0]);
+      indexes.push(tempColIndexes[j][1]);
     }
     indexes.reverse()
-  } 
+  }
   let sortedData = []
-  for(let i=0; i<indexes.length; i++) {
+  for (let i = 0; i < indexes.length; i++) {
     sortedData.push(data[indexes[i]])
   }
   data = sortedData
   if (tmp.order == undefined) {
     data = dataAtBeginning
   }
-  res.json({'data': data})
+  res.json({ 'data': data })
 })
 
 //TODO onDestroy => dataAtBeginning = data or smth like this
