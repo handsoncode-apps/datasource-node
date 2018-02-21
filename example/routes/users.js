@@ -107,5 +107,11 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
   res.json({ 'data': data })
 })
 
+router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
+  var colMove = req.body
+  console.log(colMove)
+  
+})
+
 //TODO onDestroy => dataAtBeginning = data or smth like this
 module.exports = router
