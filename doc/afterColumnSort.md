@@ -16,7 +16,10 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
 ```javascript 
 
    { 
-     column:any,
-     order:boolean
+     column:string,
+     order:ASC|DESC|null
    }
 ```
+
+column is the column name passed in colName variable in your controller.
+order is a type of sorting, ascending, descending or null.
