@@ -29,6 +29,7 @@ var data = [
   }
 ];
 var colNames = ['year', 'Tesla', 'Nissan', 'Toyota', 'Honda', 'Mazda', 'Ford']
+var colOrder = [0,1,2,3,4,5,6]
 var dataAtBeginning = data
 
 /**
@@ -36,7 +37,8 @@ var dataAtBeginning = data
    * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  let change = req.body.changes[0];
+  let change = req.body.changes[0]
+  console.log(change)
   data[change.row].values[change.column] = change.newValue;
   res.json({ 'data': change })
 })
@@ -57,8 +59,8 @@ router.post('/aftercreatecol', jsonParser, function (req, res, next) {
 })
 
 router.get('/data', function (req, res, next) {
-  res.json({data: data, columns: colNames})
-  console.log(data)  
+  res.json({data: data, columns: colNames, colOrder: colOrder})
+
 })
 
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
@@ -108,8 +110,19 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
 })
 
 router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
-  var colMove = req.body
-  console.log(colMove)
+  var colMoved = req.body
+
+  var columns = colMoved.columns
+  var position = colMoved.target
+
+  var begin= colOrder.slice(0, position).filter(x => columns.indexOf(x) === -1 )
+  var end = colOrder.slice(position).filter(x => columns.indexOf(x) === -1)
+  
+  colOrder = begin
+  colOrder = colOrder.concat(columns)
+  colOrder = colOrder.concat(end)
+  
+  res.json({'data': colOrder})
   
 })
 
