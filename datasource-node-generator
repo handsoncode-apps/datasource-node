@@ -49,6 +49,15 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
   // TODO  insert implementation here
   res.json({'data': 'ok'})
 })
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{changes:Array<Array<int>>, source:String}} req.body
+ */
+router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
+
+  // TODO  insert implementation here
+  res.json({'data': 'ok'})
+})
 
 module.exports = router
 `
