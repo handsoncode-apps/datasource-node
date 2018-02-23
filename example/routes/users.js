@@ -37,10 +37,13 @@ var dataAtBeginning = data
    * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  let change = req.body.changes[0]
-  console.log(change)
-  data[change.row].values[change.column] = change.newValue;
+  
+  let change = req.body
+  for (var i = 0; i < change.changes[i]; i++){
+    data[change.row].values[change.column] = change.newValue;
+  }
   res.json({ 'data': change })
+  console.log(change)
 })
 
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
