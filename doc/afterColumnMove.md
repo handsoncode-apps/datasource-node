@@ -21,6 +21,7 @@ router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
    }
 ```
 
-columns is the array of columns inedexes that has changed positions after 
-move.
+columns is an array of columns indexes that has changed positions after 
+moving.
+
 target is an array index where columns has been moved.
