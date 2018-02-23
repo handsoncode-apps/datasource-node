@@ -6,7 +6,7 @@ You need to create method that will catch the POST "/afterchange" url with body 
 Express.js example : 
 ```javascript
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  let change = req.body;
+  var change = req.body;
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})

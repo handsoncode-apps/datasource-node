@@ -40,7 +40,7 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
   
   
   for (var i = 0; i < req.body.changes.length; i++){
-    let change = req.body.changes[i]
+    var change = req.body.changes[i]
     data[change.row].values[change.column] = change.newValue;
     console.log(change)
   }
@@ -51,16 +51,16 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
 })
 
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
-  let createRow = req.body
-  for (let i = 0; i < createRow.amount; i++) {
+  var createRow = req.body
+  for (var i = 0; i < createRow.amount; i++) {
     data.splice(createRow.index, 0, { key: '', values: [] })
   }
 })
 
 router.post('/aftercreatecol', jsonParser, function (req, res, next) {
-  let createCol = req.body
+  var createCol = req.body
   colNames.splice(createCol.index, 0, '')
-  for (let i = 0; i < data.length; i++) {
+  for (var i = 0; i < data.length; i++) {
     data[i].values.splice([createCol.index], 0, '')
   }
 })
@@ -71,27 +71,27 @@ router.get('/data', function (req, res, next) {
 })
 
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
-  let tmp = req.body
-  let tempCol = [];
-  let indexes = [];
-  for (let i = 0; i < data.length; i++) {
+  var tmp = req.body
+  var tempCol = [];
+  var indexes = [];
+  for (var i = 0; i < data.length; i++) {
     tempCol.push(data[i].values[tmp.column])
   }
   if (tmp.order) {
-    let tempColIndexes = [];
+    var tempColIndexes = [];
     for (var i in tempCol) {
       tempColIndexes.push([tempCol[i], i]);
     }
     tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
-    let temp = [];
+    var temp = [];
     for (var j in tempColIndexes) {
       temp.push(tempColIndexes[j][0]);
       indexes.push(tempColIndexes[j][1]);
     }
   } else if (!tmp.order) {
-    let tempColIndexes = [];
+    var tempColIndexes = [];
     for (var i in tempCol) {
       tempColIndexes.push([tempCol[i], i]);
     }
@@ -105,8 +105,8 @@ router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
     }
     indexes.reverse()
   }
-  let sortedData = []
-  for (let i = 0; i < indexes.length; i++) {
+  var sortedData = []
+  for (var i = 0; i < indexes.length; i++) {
     sortedData.push({ key: data[indexes[i]].key, values: data[indexes[i]].values })
   }
   data = sortedData

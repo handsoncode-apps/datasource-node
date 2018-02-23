@@ -4,7 +4,7 @@ You need to create method that will catch the POST "/aftercolumnsort" url with b
 
 ```javascript
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
-  let tmp = req.body
+  var tmp = req.body
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})
