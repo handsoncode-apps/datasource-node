@@ -29,3 +29,4 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
   source: string
  }
 ```
+change is the array of objects you get after changing values of one or few cells. One object defines change of one cell value.
