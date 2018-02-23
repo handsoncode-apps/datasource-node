@@ -38,12 +38,16 @@ var dataAtBeginning = data
    */
 router.post('/afterchange', jsonParser, function (req, res, next) {
   
-  let change = req.body
-  for (var i = 0; i < change.changes[i]; i++){
+  
+  for (var i = 0; i < req.body.changes.length; i++){
+    let change = req.body.changes[i]
     data[change.row].values[change.column] = change.newValue;
+    console.log(change)
   }
-  res.json({ 'data': change })
-  console.log(change)
+  res.json({ 'data': 'ok' })
+
+  
+  
 })
 
 router.post('/aftercreaterow', jsonParser, function (req, res, next) {
