@@ -4,7 +4,7 @@ You need to create method that will catch the POST "/aftercolumnmove" url with b
 
 ```javascript
 router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
-  let colMoved = req.body
+  var colMoved = req.body
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})

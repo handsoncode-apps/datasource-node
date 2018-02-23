@@ -6,7 +6,7 @@ You need to create method that will catch the POST "/afterchange" url with body 
 Express.js example : 
 ```javascript
 router.post('/afterchange', jsonParser, function (req, res, next) {
-  let change = req.body;
+  var change = req.body;
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})
@@ -23,10 +23,19 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
      row:number, 
      column:any, 
      oldValue:any, 
-     newValue:any
+     newValue:any,
+     meta:{
+       row:number,
+       col:number,
+       visualRow:number,
+       visualCol:number,
+       prop:number,
+       row_id:number,
+       col_id:any
+     }
    }
   ],
   source: string
  }
 ```
-change is the array of objects you get after changing values of one or few cells. One object defines change of one cell value.
+change is the array of objects you get after changing values of one or few cells. One object defines change of one cell value and includes metadata of this object.
