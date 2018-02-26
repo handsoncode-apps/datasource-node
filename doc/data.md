@@ -13,12 +13,40 @@ example of data format is
 ```javascript
 
 var data = [
-  ['', 'Tesla', 'Nissan', 'Toyota', 'Honda', 'Mazda', 'Ford'],
-  ['2017', 10, 11, 11, 15, 15, 16],
-  ['2018', 13, 11, 12, 14, 15, 16],
-  ['2019', 10, 11, 13, 9, 15, 16],
-  ['2020', 10, 11, 14, 12, 15, 16],
-  ['2021', 10, 11, 15, 11, 15, 16]
+   {
+    key: 5,
+    values: ["2017", 10, 11, 11, 15, 15, 16]
+  },
+  {
+    key: 7,
+    values: ["2018", 13, 11, 12, 14, 15, 16]
+  },
+  {
+    key: 11,
+    values: ["2019", 10, 11, 13, 9, 15, 16]
+  },
+  {
+    key: 13,
+    values: ["2020", 10, 11, 14, 12, 15, 16]
+  },
+  {
+    key: 15,
+    values: ["2020", 10, 11, 14, 12, 15, 16]
+  }
 ];
+var colNames = ["year", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"];
+var colOrder = [0, 1, 2, 3, 4, 5, 6];
+
 ```
-Data is an array of arrays. Each array is a row where values begins on index 0 and represents subsequent columns.
+**data** is an array of objects that represent each row in table. Objects have two properties: 
+```
+{
+    key: int | string,
+    values: any
+}
+``` 
+
+
+**colNames** is an array of strings (columns names).
+
+**colOrder** is an array of numbers (columns indexes that starts with 0 index).
