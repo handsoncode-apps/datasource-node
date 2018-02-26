@@ -11,9 +11,9 @@ var router = express.Router()
 var jsonParser = bodyParser.json()
 
 /**
-   * @param {{e.RequestHandler}} jsonParser
-   * @param {{changes:Array<Array<int>>, source:String}} req.body
-   */
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{createCol:{index:number,amount:number,source:string}}} req.body
+ */
   router.post('/aftercreatecol', jsonParser, function (req, res, next) {
 
   // TODO: If you want to use this method implement your code here
@@ -22,8 +22,8 @@ var jsonParser = bodyParser.json()
 
 /**
  * @param {{e.RequestHandler}} jsonParser
- * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
-   */
+ * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
+ */
 router.post('/afterchange', jsonParser, function (req, res, next) {
 
   // TODO: If you want to use this method implement your code here
@@ -31,9 +31,9 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
 })
 
 /**
-   * @param {{e.RequestHandler}} jsonParser
-   * @param {{changes:Array<Array<int>>, source:String}} req.body
-   */
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{createRow:{index:number,amount:number,source:string}}} req.body
+ */
   router.post('/aftercreaterow', jsonParser, function (req, res, next) {
 
   // TODO: If you want to use this method implement your code here
@@ -42,22 +42,33 @@ router.post('/afterchange', jsonParser, function (req, res, next) {
 
 /**
  * @param {{e.RequestHandler}} jsonParser
- * @param {{changes:Array<Array<int>>, source:String}} req.body
+ * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
  */
 router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})
 })
+
 /**
  * @param {{e.RequestHandler}} jsonParser
- * @param {{changes:Array<Array<int>>, source:String}} req.body
+ * @param {{tmp:{columns:array,target:number}}} req.body
  */
 router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})
 })
+
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
+ */
+router.get("/data", function(req, res, next) {
+  res.json({ data: data, columns: colNames, colOrder: colOrder });
+});
+
+
 
 module.exports = router
 `
