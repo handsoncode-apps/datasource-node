@@ -34,7 +34,7 @@ var dataAtBeginning = data;
 
 /**
  * @param {{e.RequestHandler}} jsonParser
- * @param {{changes:[{row:number,column:number,newValue:string}}], source:String}} req.body
+ * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
   for (var i = 0; i < req.body.changes.length; i++) {
@@ -45,6 +45,10 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
   res.json({ data: "ok" });
 });
 
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{createRow:{index:number,amount:number,source:string}}} req.body
+ */
 router.post("/aftercreaterow", jsonParser, function(req, res, next) {
   var createRow = req.body;
   for (var i = 0; i < createRow.amount; i++) {
@@ -52,6 +56,10 @@ router.post("/aftercreaterow", jsonParser, function(req, res, next) {
   }
 });
 
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{createCol:{index:number,amount:number,source:string}}} req.body
+ */
 router.post("/aftercreatecol", jsonParser, function(req, res, next) {
   var createCol = req.body;
   colNames.splice(createCol.index, 0, "");
@@ -60,10 +68,18 @@ router.post("/aftercreatecol", jsonParser, function(req, res, next) {
   }
 });
 
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
+ */
 router.get("/data", function(req, res, next) {
   res.json({ data: data, columns: colNames, colOrder: colOrder });
 });
 
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
+ */
 router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
   var tmp = req.body;
   var tempCol = [];
@@ -113,6 +129,10 @@ router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
   res.json({ data: data });
 });
 
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{tmp:{columns:array,target:number}}} req.body
+ */
 router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
   var colMoved = req.body;
 
