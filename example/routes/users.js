@@ -40,15 +40,18 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
   for (var i = 0; i < req.body.changes.length; i++) {
     var change = req.body.changes[i];
     data[change.row].values[change.column] = change.newValue;
-    console.log(change);
   }
   res.json({ data: "ok" });
 });
 
 router.post("/aftercreaterow", jsonParser, function(req, res, next) {
   var createRow = req.body;
+  var values = [];
+  for (var i = 0; i < data[0].values.length; i++) {
+    values.push("");
+  }
   for (var i = 0; i < createRow.amount; i++) {
-    data.splice(createRow.index, 0, { key: "", values: [] });
+    data.splice(createRow.index, 0, { key: "", values: values });
   }
 });
 
