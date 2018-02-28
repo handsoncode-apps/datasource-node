@@ -32,6 +32,16 @@ var colNames = ["year", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"];
 var colOrder = [0, 1, 2, 3, 4, 5, 6];
 var dataAtBeginning = data;
 
+var settings = {
+    rowHeaders: true,
+    colHeaders: true,
+    manualRowMove: true,
+    manualColumnMove: true,
+    columnSorting: true,
+    sortIndicator: true,
+    manualColumnMove: true,
+    manualRowMove: true
+  }
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
@@ -153,6 +163,10 @@ router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
 
   res.json({ data: colOrder });
 });
+router.get("/settings", function(req, res, next) {
+  res.json({ data: settings});
+});
+
 
 //TODO onDestroy => dataAtBeginning = data or smth like this
 module.exports = router;
