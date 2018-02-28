@@ -28,20 +28,68 @@ var data = [
     values: ["2020", 10, 11, 14, 12, 15, 16]
   }
 ];
-var colNames = ["year", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"];
-var colOrder = [0, 1, 2, 3, 4, 5, 6];
-var dataAtBeginning = data;
 
 var settings = {
-    rowHeaders: true,
-    colHeaders: true,
-    manualRowMove: true,
-    manualColumnMove: true,
-    columnSorting: true,
-    sortIndicator: true,
-    manualColumnMove: true,
-    manualRowMove: true
+  rowHeaders: true,
+  colHeaders: true,
+  datasourceConnectorPlugin: true,
+
+  contextMenu: true,
+  manualColumnMove: true,
+  manualRowMove: true,
+  columnSorting: {
+    column: 1
+  },
+  sortIndicator: true
+};
+
+var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
+var dataAtBeginning = data;
+
+const sqlite3 = require("sqlite3").verbose();
+var db = new sqlite3.Database("./database.db", function(data) {
+  console.log("data", data);
+  if (data == null) {
+    // initialize database
+    db.serialize(function() {
+      db.run(
+        "CREATE TABLE IF NOT EXISTS `settings` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT)"
+      );
+      db.run(
+        "CREATE TABLE IF NOT EXISTS `data` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, age INTEGER, sex TEXT, phone TEXT)"
+      );
+      db.run(
+        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (key)"
+      );
+      db.run("CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON `data` (phone)");
+    });
   }
+  // initailize settings
+  db.serialize(function() {
+    let stmt = db.prepare(
+      "INSERT INTO `settings` (`key`, `value`) VALUES (?, ?)"
+    );
+    stmt.run("settings", JSON.stringify(settings), function(err, data) {});
+    stmt.finalize();
+  });
+  // initailize dummy data
+  db.serialize(function() {
+    db.all("SELECT * FROM `data` LIMIT 1", (err, rows) => {
+      if (rows.length === 0) {
+        let stmt = db.prepare(
+          "INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES (?, ?, ?, ?, ?)"
+        );
+        stmt.run("John", "Smith", "10", "male", "+435564656");
+        stmt.run("Kasia", "Sandwich", "18", "female", "+4325324");
+        stmt.run("Jane", "Walker", "60", "female", "+43553456");
+        stmt.run("Rafal", "Ek", "34", "male", "+4354324234");
+        stmt.run("Kam", "Dobrz", "20", "male", "+435223122");
+        stmt.finalize();
+      }
+    });
+  });
+});
+
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
@@ -86,7 +134,9 @@ router.post("/aftercreatecol", jsonParser, function(req, res, next) {
  * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
  */
 router.get("/data", function(req, res, next) {
-  res.json({ data: data, columns: colNames, colOrder: colOrder });
+  db.all("SELECT * FROM `data`", (err, rows) => {
+    res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
+  });
 });
 
 /**
@@ -168,5 +218,8 @@ router.get("/settings", function(req, res, next) {
 });
 
 
+router.get("/settings", jsonParser, function(req, res, next) {
+  res.json({ data: settings });
+});
 //TODO onDestroy => dataAtBeginning = data or smth like this
 module.exports = router;
