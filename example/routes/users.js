@@ -213,10 +213,6 @@ router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
 
   res.json({ data: colOrder });
 });
-router.get("/settings", function(req, res, next) {
-  res.json({ data: settings});
-});
-
 
 router.get("/settings", jsonParser, function(req, res, next) {
   res.json({ data: settings });
