@@ -42,7 +42,7 @@ var settings = {
   },
   sortIndicator: true
 };
-
+var cellMeta = {row_id: 'row', column_name: 'column'}
 var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
 var dataAtBeginning = data;
 
@@ -59,9 +59,17 @@ var db = new sqlite3.Database("./database.db", function(data) {
         "CREATE TABLE IF NOT EXISTS `data` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, age INTEGER, sex TEXT, phone TEXT)"
       );
       db.run(
+        "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT)"
+      );
+      db.run(
         "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (key)"
       );
-      db.run("CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON `data` (phone)");
+      db.run(
+        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON data (phone)"
+      );
+      db.run(
+        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (id)"
+      );
     });
   }
   // initailize settings
@@ -88,7 +96,15 @@ var db = new sqlite3.Database("./database.db", function(data) {
       }
     });
   });
-});
+  // initailize cellMeta
+  db.serialize(function() {
+       let stmt = db.prepare(
+          "INSERT INTO `cellMeta` ('key', 'value') VALUES (?, ?)"
+        );
+        stmt.run("cellMeta", JSON.stringify(cellMeta), function(err, data) {});
+        stmt.finalize();
+      })
+  });
 
 /**
  * @param {{e.RequestHandler}} jsonParser
