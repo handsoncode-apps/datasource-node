@@ -6,28 +6,7 @@ var router = express.Router();
 // create application/json parser
 var jsonParser = bodyParser.json();
 
-var data = [
-  {
-    key: 5,
-    values: ["2017", 10, 11, 11, 15, 15, 16]
-  },
-  {
-    key: 7,
-    values: ["2018", 13, 11, 12, 14, 15, 16]
-  },
-  {
-    key: 11,
-    values: ["2019", 10, 11, 13, 9, 15, 16]
-  },
-  {
-    key: 13,
-    values: ["2020", 10, 11, 14, 12, 15, 16]
-  },
-  {
-    key: 15,
-    values: ["2020", 10, 11, 14, 12, 15, 16]
-  }
-];
+var data = [];
 
 var settings = {
   rowHeaders: true,
@@ -96,16 +75,11 @@ var db = new sqlite3.Database("./database.db", function(data) {
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
   let changes = req.body.changes
-  console.log(changes)
-  console.log(changes.length)
 
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row + 1
     db.serialize(function() {
       let stmt = db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE rowid = '" + rowId + "'")
-      console.log('changes[i].column', changes[i].column)
-      console.log('changes[i].newValue', changes[i].newValue)
-      console.log('changes[i].row', changes[i].row)
       stmt.run()
       stmt.finalize()
     })
@@ -155,53 +129,33 @@ router.get("/data", function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
  */
-router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
-  var tmp = req.body;
+router.get("/aftercolumnsort", function(req, res, next) {
+  let sort = {
+    column: req.query.column,
+    order: req.query.order
+  }
+
+  if (sort.column !== 'undefined') {
+    if (sort.order === 'true') {
+      sort.order = 'ASC'
+    } else if ( sort.order === 'false') {
+      sort.order = 'DESC'
+    } else {
+      sort.order = ''
+    }
+  }
+
   var tempCol = [];
   var indexes = [];
-  for (var i = 0; i < data.length; i++) {
-    tempCol.push(data[i].values[tmp.column]);
-  }
-  if (tmp.order) {
-    var tempColIndexes = [];
-    for (var i in tempCol) {
-      tempColIndexes.push([tempCol[i], i]);
-    }
-    tempColIndexes.sort(function(left, right) {
-      return left[0] < right[0] ? -1 : 1;
-    });
-    var temp = [];
-    for (var j in tempColIndexes) {
-      temp.push(tempColIndexes[j][0]);
-      indexes.push(tempColIndexes[j][1]);
-    }
-  } else if (!tmp.order) {
-    var tempColIndexes = [];
-    for (var i in tempCol) {
-      tempColIndexes.push([tempCol[i], i]);
-    }
-    tempColIndexes.sort(function(left, right) {
-      return left[0] < right[0] ? -1 : 1;
-    });
-    var temp = [];
-    for (var j in tempColIndexes) {
-      temp.push(tempColIndexes[j][0]);
-      indexes.push(tempColIndexes[j][1]);
-    }
-    indexes.reverse();
-  }
-  var sortedData = [];
-  for (var i = 0; i < indexes.length; i++) {
-    sortedData.push({
-      key: data[indexes[i]].key,
-      values: data[indexes[i]].values
-    });
-  }
-  data = sortedData;
-  if (tmp.order == undefined) {
-    data = dataAtBeginning;
-  }
-  res.json({ data: data });
+  
+  db.serialize(function() {
+    db.all("SELECT * FROM `data` ORDER BY " + sort.column + " " + sort.order, (err, rows) => {
+      if (rows) {
+        res.json({data: rows})
+      }
+    })
+  })
+
 });
 
 /**
