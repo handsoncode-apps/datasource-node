@@ -42,7 +42,7 @@ var settings = {
   },
   sortIndicator: true
 };
-var cellMeta = {row_id: 'row', column_name: 'column'};
+var cellMeta = [];
 var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
 var dataAtBeginning = data;
 
@@ -103,10 +103,10 @@ var db = new sqlite3.Database("./database.db", function(data) {
        let stmt = db.prepare(
           "INSERT INTO `cellMeta` ('key', 'value') VALUES (?, ?)"
         );
-        stmt.run("cellMeta", JSON.stringify(cellMeta), function(err, data) {});
+        stmt.run("cellMeta", JSON.stringify(cellMeta));
         stmt.finalize();
       }
-    });
+      });
   });
 });
 
@@ -118,8 +118,11 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
   for (var i = 0; i < req.body.changes.length; i++) {
     var change = req.body.changes[i];
     data[change.row].values[change.column] = change.newValue;
-  }
+    cellMeta.push(change.meta);
+    
+    }
   res.json({ data: "ok" });
+  
 });
 
 /**
@@ -158,6 +161,7 @@ router.get("/data", function(req, res, next) {
     res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
   });
 });
+
 
 /**
  * @param {{e.RequestHandler}} jsonParser
