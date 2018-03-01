@@ -38,7 +38,7 @@ var settings = {
   manualColumnMove: true,
   manualRowMove: true,
   columnSorting: {
-    column: 1
+    column: 0
   },
   sortIndicator: true
 };
@@ -111,10 +111,22 @@ var db = new sqlite3.Database("./database.db", function(data) {
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
-  for (var i = 0; i < req.body.changes.length; i++) {
-    var change = req.body.changes[i];
-    data[change.row].values[change.column] = change.newValue;
+  let changes = req.body.changes
+  console.log(changes)
+  console.log(changes.length)
+
+  for (let i = 0; i < changes.length; i++) {
+    let rowId = changes[i].row + 1
+    db.serialize(function() {
+      let stmt = db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE rowid = '" + rowId + "'")
+      console.log('changes[i].column', changes[i].column)
+      console.log('changes[i].newValue', changes[i].newValue)
+      console.log('changes[i].row', changes[i].row)
+      stmt.run()
+      stmt.finalize()
+    })
   }
+
   res.json({ data: "ok" });
 });
 
