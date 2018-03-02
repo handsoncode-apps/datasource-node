@@ -27,7 +27,7 @@ var dataAtBeginning = data;
 
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./database.db", function(data) {
-  console.log("data", data);
+
   if (data == null) {
     // initialize database
     db.serialize(function() {
@@ -38,16 +38,16 @@ var db = new sqlite3.Database("./database.db", function(data) {
         "CREATE TABLE IF NOT EXISTS `data` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, age INTEGER, sex TEXT, phone TEXT)"
       );
       db.run(
-        "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT)"
+        "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rowId TEXT, colId TEXT, meta TEXT)"
       );
       db.run(
-        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (key)"
+        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (id)"
       );
       db.run(
         "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON data (phone)"
       );
       db.run(
-        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (id)"
+        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (rowId)"
       );
     });
   }
@@ -80,9 +80,9 @@ var db = new sqlite3.Database("./database.db", function(data) {
     db.all("SELECT * FROM `data` LIMIT 1", (err, rows) => {
       if (rows.length === 0) {
        let stmt = db.prepare(
-          "INSERT INTO `cellMeta` ('key', 'value') VALUES (?, ?)"
+          "INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)"
         );
-        stmt.run("cellMeta", JSON.stringify(cellMeta));
+        stmt.run('', '' , JSON.stringify(cellMeta));
         stmt.finalize();
       }
       });
@@ -96,22 +96,24 @@ var db = new sqlite3.Database("./database.db", function(data) {
 router.post("/afterchange", jsonParser, function(req, res, next) {
   
   let changes = req.body.changes
+  
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row
+    let meta = changes[i].meta
+    console.log('changes', changes)
+    console.log('meta',meta)
+    console.log('row',rowId)
     db.serialize(function(error) {
-      var sql = "UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'";
-      console.log(sql)
-      let stmt = db.prepare(sql, function(err){
-        console.log(err)
-      })
+      let stmt =  db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
+      db.prepare("UPDATE `cellMeta` SET meta = '"+ meta +"' WHERE rowId = '" + rowId + "'" )
       stmt.run()
       stmt.finalize()
     })
-  }
+  
  
   res.json({ data: "ok" });
-});
-
+};
+})
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
