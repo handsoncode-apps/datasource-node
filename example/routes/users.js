@@ -94,17 +94,21 @@ var db = new sqlite3.Database("./database.db", function(data) {
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
+  
   let changes = req.body.changes
-  console.log(changes)
   for (let i = 0; i < changes.length; i++) {
-    let rowId = changes[i].row + 1
-    db.serialize(function() {
-      let stmt = db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE rowid = '" + rowId + "'")
+    let rowId = changes[i].row
+    db.serialize(function(error) {
+      var sql = "UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'";
+      console.log(sql)
+      let stmt = db.prepare(sql, function(err){
+        console.log(err)
+      })
       stmt.run()
       stmt.finalize()
     })
   }
-
+ 
   res.json({ data: "ok" });
 });
 
