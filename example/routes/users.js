@@ -17,19 +17,19 @@ var settings = {
   manualColumnMove: true,
   manualRowMove: true,
   columnSorting: {
-    column: 0
+    column: 1
   },
   sortIndicator: true,
   filters: true,
   dropdownMenu: true,
 };
-var cellMeta = {row_id: 'row', column_name: 'column'}
+var cellMeta = [];
 var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
 var dataAtBeginning = data;
 
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./database.db", function(data) {
-  console.log("data", data);
+
   if (data == null) {
     // initialize database
     db.serialize(function() {
@@ -40,16 +40,16 @@ var db = new sqlite3.Database("./database.db", function(data) {
         "CREATE TABLE IF NOT EXISTS `data` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, first_name TEXT, last_name TEXT, age INTEGER, sex TEXT, phone TEXT)"
       );
       db.run(
-        "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT)"
+        "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rowId TEXT, colId TEXT, meta TEXT)"
       );
       db.run(
-        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (key)"
+        "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (id)"
       );
       db.run(
         "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON data (phone)"
       );
       db.run(
-        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (id)"
+        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (rowId)"
       );
     });
   }
@@ -79,32 +79,43 @@ var db = new sqlite3.Database("./database.db", function(data) {
   });
   // initailize cellMeta
   db.serialize(function() {
+    db.all("SELECT * FROM `data` LIMIT 1", (err, rows) => {
+      if (rows.length === 0) {
        let stmt = db.prepare(
-          "INSERT INTO `cellMeta` ('key', 'value') VALUES (?, ?)"
+          "INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)"
         );
-        stmt.run("cellMeta", JSON.stringify(cellMeta), function(err, data) {});
+        stmt.run('', '' , JSON.stringify(cellMeta));
         stmt.finalize();
-      })
+      }
+      });
   });
+});
 
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
+  
   let changes = req.body.changes
+  
   for (let i = 0; i < changes.length; i++) {
-    let rowId = changes[i].row + 1
-    db.serialize(function() {
-      let stmt = db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE rowid = '" + rowId + "'")
+    let rowId = changes[i].row
+    let meta = changes[i].meta
+    console.log('changes', changes)
+    console.log('meta',meta)
+    console.log('row',rowId)
+    db.serialize(function(error) {
+      let stmt =  db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
+      db.prepare("UPDATE `cellMeta` SET meta = '"+ meta +"' WHERE rowId = '" + rowId + "'" )
       stmt.run()
       stmt.finalize()
     })
-  }
-
+  
+ 
   res.json({ data: "ok" });
-});
-
+};
+})
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
@@ -143,6 +154,7 @@ router.get("/data", function(req, res, next) {
   });
 });
 
+
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
@@ -161,10 +173,53 @@ router.get("/aftercolumnsort", function(req, res, next) {
     } else {
       sort.order = ''
     }
+  } 
+})
+router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
+  var tmp = req.body;
+  var tempCol = [];
+  var indexes = [];
+  for (var i = 0; i < data.length; i++) {
+    tempCol.push(data[i].values[tmp.column]);
   }
-   else {
-    res.json({data: []})
+  if (tmp.order) {
+    var tempColIndexes = [];
+    for (var i in tempCol) {
+      tempColIndexes.push([tempCol[i], i]);
+    }
+    tempColIndexes.sort(function(left, right) {
+      return left[0] < right[0] ? -1 : 1;
+    });
+    var temp = [];
+    for (var j in tempColIndexes) {
+      temp.push(tempColIndexes[j][0]);
+      indexes.push(tempColIndexes[j][1]);
+    }
+  } else if (!tmp.order) {
+    var tempColIndexes = [];
+    for (var i in tempCol) {
+      tempColIndexes.push([tempCol[i], i]);
+    }
+    tempColIndexes.sort(function(left, right) {
+      return left[0] < right[0] ? -1 : 1;
+    });
+    var temp = [];
+    for (var j in tempColIndexes) {
+      temp.push(tempColIndexes[j][0]);
+      indexes.push(tempColIndexes[j][1]);
+    }
+    indexes.reverse();
   }
+  var sortedData = [];
+  for (var i = 0; i < indexes.length; i++) {
+    sortedData.push({
+      key: data[indexes[i]].key,
+      values: data[indexes[i]].values
+    });
+  }
+  //  else {
+  //   res.json({data: []})
+  // }
 
   var tempCol = [];
   var indexes = [];
@@ -177,6 +232,11 @@ router.get("/aftercolumnsort", function(req, res, next) {
     })
   })
 
+  data = sortedData;
+  if (tmp.order == undefined) {
+    data = dataAtBeginning;
+  }
+  res.json({ data: data });
 });
 
 /**
