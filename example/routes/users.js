@@ -19,7 +19,9 @@ var settings = {
   columnSorting: {
     column: 0
   },
-  sortIndicator: true
+  sortIndicator: true,
+  filters: true,
+  dropdownMenu: true,
 };
 var cellMeta = {row_id: 'row', column_name: 'column'}
 var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
@@ -91,7 +93,6 @@ var db = new sqlite3.Database("./database.db", function(data) {
  */
 router.post("/afterchange", jsonParser, function(req, res, next) {
   let changes = req.body.changes
-
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row + 1
     db.serialize(function() {
@@ -111,12 +112,11 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
 router.post("/aftercreaterow", jsonParser, function(req, res, next) {
   var createRow = req.body;
   var values = [];
-  for (var i = 0; i < data[0].values.length; i++) {
-    values.push("");
-  }
-  for (var i = 0; i < createRow.amount; i++) {
-    data.splice(createRow.index, 0, { key: "", values: values });
-  }
+  db.serialize(function() {
+    let stmt = db.prepare("INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES ('', '', '', '', '')")
+    stmt.run()
+    stmt.finalize()
+  })
 });
 
 /**
@@ -126,9 +126,11 @@ router.post("/aftercreaterow", jsonParser, function(req, res, next) {
 router.post("/aftercreatecol", jsonParser, function(req, res, next) {
   var createCol = req.body;
   colNames.splice(createCol.index, 0, "");
-  for (var i = 0; i < data.length; i++) {
-    data[i].values.splice([createCol.index], 0, "");
-  }
+  db.serialize(function() {
+    let stmt = db.prepare("alter table `data` add column testy TEXT")
+    stmt.run()
+    stmt.finalize()
+  })
 });
 
 /**
@@ -159,6 +161,9 @@ router.get("/aftercolumnsort", function(req, res, next) {
     } else {
       sort.order = ''
     }
+  }
+   else {
+    res.json({data: []})
   }
 
   var tempCol = [];
@@ -195,6 +200,34 @@ router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
 
   res.json({ data: colOrder });
 });
+
+
+router.get("/afterfilter", jsonParser, function(req, res, next) {
+  var queries = req.query
+  let dbQuery = 'SELECT * FROM \`data\` WHERE '
+  for (let query in queries) {
+    var col_name = query
+    let options = queries[query]
+    for (let option in options) {
+      let params = options[option]
+      if (option === 'not_empty') {
+        dbQuery += "`" + col_name + "` IS NOT NULL OR "
+      } else if (option === 'by_value') {
+        for (let i = 0; i < params.length; i++) {
+          dbQuery += "`" + col_name + "` = '" + params[i] + "'"
+          if (i !== params.length - 1) {
+            dbQuery += " OR "
+          }
+        }
+      }
+    }
+  }
+  db.serialize(() => {
+    db.all(dbQuery, (err, rows) => {
+      res.json({data: rows})
+    })
+  })
+})
 
 router.get("/settings", jsonParser, function(req, res, next) {
   res.json({ data: settings });
