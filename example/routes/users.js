@@ -265,26 +265,56 @@ router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
 router.get("/afterfilter", jsonParser, function(req, res, next) {
   var queries = req.query
   let dbQuery = 'SELECT * FROM \`data\` WHERE '
+  let i = 0
   for (let query in queries) {
     var col_name = query
     let options = queries[query]
     for (let option in options) {
       let params = options[option]
-      if (option === 'not_empty') {
-        dbQuery += "`" + col_name + "` IS NOT NULL OR "
+      console.log('ption', option)
+      if (option === "empty") {
+        dbQuery += "`" + col_name + "` IS NULL " //to do OR/AND
+      } else if (option === 'not_empty') {
+        dbQuery += "`" + col_name + "` IS NOT NULL " //to do OR/AND
+      } else if (option === 'eq') {
+        dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
+      } else if (option === 'neq') {
+        dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'" 
       } else if (option === 'by_value') {
-        for (let i = 0; i < params.length; i++) {
-          dbQuery += "`" + col_name + "` = '" + params[i] + "'"
-          if (i !== params.length - 1) {
-            dbQuery += " OR "
+        if (typeof params === 'string') {
+          dbQuery += "`" + col_name + "` = '" + params + "'"
+        } else {
+          dbQuery += "`" + col_name + "` IN ("
+          for (let i = 0; i < params.length; i++) {
+            dbQuery += "'" + params[i] + "',"
+            // if (i !== params.length - 1) {
+            //   dbQuery += " OR "
+            // }
           }
+          dbQuery = dbQuery.slice(0, -1)
+          dbQuery += ")"
         }
+      } else if (option === "begins_with") {
+        dbQuery += "`" + col_name + "` LIKE '" + params + "%' "
+      } else if (option === "ends_with") {
+        dbQuery += "`" + col_name + "` LIKE '%" + params + "' "
+      } else if (option === 'contains') {
+        dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
+      } else if (option === 'not_contains') {
+        dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
       }
     }
+    if (i < Object.keys(queries).length - 1) {
+      dbQuery += " AND "
+    }
+    i++
   }
+  console.log(dbQuery)
   db.serialize(() => {
     db.all(dbQuery, (err, rows) => {
+      console.log('rows', rows)
       res.json({data: rows})
+      // res.json({ data: 'ok' });
     })
   })
 })
