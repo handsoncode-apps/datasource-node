@@ -77,24 +77,13 @@ var db = new sqlite3.Database("./database.db", function(data) {
       }
     });
   });
-  // initailize cellMeta
-  db.serialize(function() {
-    db.all("SELECT * FROM `data` LIMIT 1", (err, rows) => {
-      if (rows.length === 0) {
-       let stmt = db.prepare(
-          "INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)"
-        );
-        stmt.run('', '' , JSON.stringify(cellMeta));
-        stmt.finalize();
-      }
-      });
-  });
-});
+  
 
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
+
 router.post("/afterchange", jsonParser, function(req, res, next) {
   
   let changes = req.body.changes
@@ -102,19 +91,30 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row
     let meta = changes[i].meta
-    console.log('changes', changes)
-    console.log('meta',meta)
-    console.log('row',rowId)
+    console.log(meta.row_id)
+    console.log(meta.col_id)
+    console.log(JSON.stringify(meta))    
     db.serialize(function(error) {
       let stmt =  db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
-      db.prepare("UPDATE `cellMeta` SET meta = '"+ meta +"' WHERE rowId = '" + rowId + "'" )
       stmt.run()
       stmt.finalize()
     })
-  
- 
+   
+    db.all("SELECT * FROM `cellMeta` LIMIT 1", (err, rows) => {
+      if (rows.length === 0) {
+      db.serialize(function(error) {
+        let stmt =  db.prepare("INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)");
+        stmt.run('rowId', 'colId' , 'meta');
+        db.prepare("UPDATE `cellMeta` SET meta  = '" + JSON.stringify(meta) + "' WHERE rowId = '" + meta.row_id + "' AND colId = '" + meta.col_id + "'");
+        stmt.run()
+        stmt.finalize()
+      })
+    }})  
+
   res.json({ data: "ok" });
-};
+  };s
+});
+
 })
 /**
  * @param {{e.RequestHandler}} jsonParser
