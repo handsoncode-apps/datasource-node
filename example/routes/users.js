@@ -268,40 +268,48 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
   for (let query in queries) {
     var col_name = query
     let options = queries[query]
-    console.log('options', options)
     let i = 0
     for (let option in options) {
       let params = options[option]
-      if (option === "empty") {
-        dbQuery += "`" + col_name + "` IS NULL"
-      } else if (option === 'not_empty') {
-        dbQuery += "`" + col_name + "` IS NOT NULL"
-      } else if (option === 'eq') {
-        dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
-      } else if (option === 'neq') {
-        dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'" 
-      } else if (option === 'by_value') {
-        if (typeof params === 'string') {
-          dbQuery += "`" + col_name + "` = '" + params + "'"
-        } else {
-          dbQuery += "`" + col_name + "` IN ("
-          for (let i = 0; i < params.length; i++) {
-            dbQuery += "'" + params[i] + "',"
+      switch (option) {
+        case "empty":
+          dbQuery += "`" + col_name + "` IS NULL"
+          break;
+        case "not_empty":
+          dbQuery += "`" + col_name + "` IS NOT NULL"
+          break;
+        case "eq":
+          dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
+          break;
+        case "neq":
+          dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'" 
+          break;
+        case "by_value":
+          if (typeof params === 'string') {
+            dbQuery += "`" + col_name + "` = '" + params + "'"
+          } else {
+            dbQuery += "`" + col_name + "` IN ("
+            for (let i = 0; i < params.length; i++) {
+              dbQuery += "'" + params[i] + "',"
+            }
+            dbQuery = dbQuery.slice(0, -1)
+            dbQuery += ")"
           }
-          dbQuery = dbQuery.slice(0, -1)
-          dbQuery += ")"
-        }
-      } else if (option === "begins_with") {
-        dbQuery += "`" + col_name + "` LIKE '" + params + "%' "
-      } else if (option === "ends_with") {
-        dbQuery += "`" + col_name + "` LIKE '%" + params + "' "
-      } else if (option === 'contains') {
-        dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
-      } else if (option === 'not_contains') {
-        dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
-      } 
+          break;
+        case "begins_with":
+          dbQuery += "`" + col_name + "` LIKE '" + params + "%' "
+          break;
+        case "ends_with":
+          dbQuery += "`" + col_name + "` LIKE '%" + params + "' "
+          break;
+        case "contains":
+          dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
+          break;
+        case "not_contains":
+          dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
+          break;
+      }
       if (option !== 'operator' && options.operator && i < options.operator.length) {
-        console.log('actual query', dbQuery)
         if (typeof options.operator === 'string') {
           dbQuery += " " + options.operator
           i = options.operator.length
@@ -310,12 +318,14 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
           i++
         }
       }
+      var lastKey = Object.keys(queries)[Object.keys(queries).length-1]
+      if (col_name !== lastKey) {
+        dbQuery += " and "
+      }
     }
   }
-  console.log(dbQuery)
   db.serialize(() => {
     db.all(dbQuery, (err, rows) => {
-      console.log('rows', rows)
       res.json({data: rows || []})
     })
   })
