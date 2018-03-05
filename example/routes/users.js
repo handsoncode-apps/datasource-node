@@ -268,23 +268,65 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
   for (let query in queries) {
     var col_name = query
     let options = queries[query]
+    let i = 0
     for (let option in options) {
       let params = options[option]
-      if (option === 'not_empty') {
-        dbQuery += "`" + col_name + "` IS NOT NULL OR "
-      } else if (option === 'by_value') {
-        for (let i = 0; i < params.length; i++) {
-          dbQuery += "`" + col_name + "` = '" + params[i] + "'"
-          if (i !== params.length - 1) {
-            dbQuery += " OR "
+      switch (option) {
+        case "empty":
+          dbQuery += "`" + col_name + "` IS NULL"
+          break;
+        case "not_empty":
+          dbQuery += "`" + col_name + "` IS NOT NULL"
+          break;
+        case "eq":
+          dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
+          break;
+        case "neq":
+          dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'" 
+          break;
+        case "by_value":
+          if (typeof params === 'string') {
+            dbQuery += "`" + col_name + "` = '" + params + "'"
+          } else {
+            dbQuery += "`" + col_name + "` IN ("
+            for (let i = 0; i < params.length; i++) {
+              dbQuery += "'" + params[i] + "',"
+            }
+            dbQuery = dbQuery.slice(0, -1)
+            dbQuery += ")"
           }
+          break;
+        case "begins_with":
+          dbQuery += "`" + col_name + "` LIKE '" + params + "%' "
+          break;
+        case "ends_with":
+          dbQuery += "`" + col_name + "` LIKE '%" + params + "' "
+          break;
+        case "contains":
+          dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
+          break;
+        case "not_contains":
+          dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
+          break;
+      }
+      if (option !== 'operator' && options.operator && i < options.operator.length) {
+        if (typeof options.operator === 'string') {
+          dbQuery += " " + options.operator
+          i = options.operator.length
+        } else {
+          dbQuery += " " + options.operator[i] + " "
+          i++
         }
+      }
+      var lastKey = Object.keys(queries)[Object.keys(queries).length-1]
+      if (col_name !== lastKey) {
+        dbQuery += " and "
       }
     }
   }
   db.serialize(() => {
     db.all(dbQuery, (err, rows) => {
-      res.json({data: rows})
+      res.json({data: rows || []})
     })
   })
 })
