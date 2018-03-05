@@ -111,7 +111,7 @@ router.post("/afterchange", jsonParser, function(req, res, next) {
       stmt.run()
       stmt.finalize()
     })
-  
+
  
   res.json({ data: "ok" });
 };
@@ -268,12 +268,14 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
   for (let query in queries) {
     var col_name = query
     let options = queries[query]
+    console.log('options', options)
+    let i = 0
     for (let option in options) {
       let params = options[option]
       if (option === "empty") {
-        dbQuery += "`" + col_name + "` IS NULL "
+        dbQuery += "`" + col_name + "` IS NULL"
       } else if (option === 'not_empty') {
-        dbQuery += "`" + col_name + "` IS NOT NULL "
+        dbQuery += "`" + col_name + "` IS NOT NULL"
       } else if (option === 'eq') {
         dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
       } else if (option === 'neq') {
@@ -297,9 +299,16 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
         dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
       } else if (option === 'not_contains') {
         dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
-      }
-      if (option === "operator") {
-        dbQuery += params + " "
+      } 
+      if (option !== 'operator' && options.operator && i < options.operator.length) {
+        console.log('actual query', dbQuery)
+        if (typeof options.operator === 'string') {
+          dbQuery += " " + options.operator
+          i = options.operator.length
+        } else {
+          dbQuery += " " + options.operator[i] + " "
+          i++
+        }
       }
     }
   }
