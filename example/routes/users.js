@@ -28,11 +28,10 @@ var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
 var dataAtBeginning = data;
 
 const sqlite3 = require("sqlite3").verbose();
-var db = new sqlite3.Database("./database.db", function(data) {
-
+var db = new sqlite3.Database("./database.db", function (data) {
   if (data == null) {
     // initialize database
-    db.serialize(function() {
+    db.serialize(function () {
       db.run(
         "CREATE TABLE IF NOT EXISTS `settings` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, key TEXT, value TEXT)"
       );
@@ -49,20 +48,20 @@ var db = new sqlite3.Database("./database.db", function(data) {
         "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON data (phone)"
       );
       db.run(
-        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (rowId)"
+        "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (rowId, colId)"
       );
     });
   }
   // initailize settings
-  db.serialize(function() {
+  db.serialize(function () {
     let stmt = db.prepare(
       "INSERT INTO `settings` (`key`, `value`) VALUES (?, ?)"
     );
-    stmt.run("settings", JSON.stringify(settings), function(err, data) {});
+    stmt.run("settings", JSON.stringify(settings), function (err, data) { });
     stmt.finalize();
   });
   // initailize dummy data
-  db.serialize(function() {
+  db.serialize(function () {
     db.all("SELECT * FROM `data` LIMIT 1", (err, rows) => {
       if (rows.length === 0) {
         let stmt = db.prepare(
@@ -77,53 +76,48 @@ var db = new sqlite3.Database("./database.db", function(data) {
       }
     });
   });
-  
+})
 
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
+router.post("/afterchange", jsonParser, function (req, res, next) {
 
-router.post("/afterchange", jsonParser, function(req, res, next) {
-  
   let changes = req.body.changes
-  
+
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row
     let meta = changes[i].meta
-    console.log(meta.row_id)
-    console.log(meta.col_id)
-    console.log(JSON.stringify(meta))    
-    db.serialize(function(error) {
-      let stmt =  db.prepare("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
-      stmt.run()
-      stmt.finalize()
+    db.serialize(function (error) {
+      db.run("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
     })
-   
-    db.all("SELECT * FROM `cellMeta` LIMIT 1", (err, rows) => {
-      if (rows.length === 0) {
-      db.serialize(function(error) {
-        let stmt =  db.prepare("INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)");
-        stmt.run('rowId', 'colId' , 'meta');
-        db.prepare("UPDATE `cellMeta` SET meta  = '" + JSON.stringify(meta) + "' WHERE rowId = '" + meta.row_id + "' AND colId = '" + meta.col_id + "'");
-        stmt.run()
-        stmt.finalize()
-      })
-    }})  
+    let data = [changes[i].row, changes[i].column, JSON.stringify(meta)];
+    db.run("INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)", data, function (err) {
+      if (err) {
+        var update = []
+        update.push(data[2])
+        update.push(data[0])
+        update.push(data[1])
+        db.run("UPDATE `cellMeta` SET meta=? WHERE rowId=? AND colId=?", update, function (err) {
+          if (err)
+            return console.error(err.message);
+        })
+      }
+    })
+  }
 
   res.json({ data: "ok" });
-  };s
 });
 
-})
 /**
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/aftercreaterow", jsonParser, function(req, res, next) {
+router.post("/aftercreaterow", jsonParser, function (req, res, next) {
   var createRow = req.body;
   var values = [];
-  db.serialize(function() {
+  db.serialize(function () {
     let stmt = db.prepare("INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES ('', '', '', '', '')")
     stmt.run()
     stmt.finalize()
@@ -134,10 +128,10 @@ router.post("/aftercreaterow", jsonParser, function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createCol:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/aftercreatecol", jsonParser, function(req, res, next) {
+router.post("/aftercreatecol", jsonParser, function (req, res, next) {
   var createCol = req.body;
   colNames.splice(createCol.index, 0, "");
-  db.serialize(function() {
+  db.serialize(function () {
     let stmt = db.prepare("alter table `data` add column testy TEXT")
     stmt.run()
     stmt.finalize()
@@ -148,7 +142,7 @@ router.post("/aftercreatecol", jsonParser, function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
  */
-router.get("/data", function(req, res, next) {
+router.get("/data", function (req, res, next) {
   db.all("SELECT * FROM `data`", (err, rows) => {
     res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
   });
@@ -159,7 +153,7 @@ router.get("/data", function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
  */
-router.get("/aftercolumnsort", function(req, res, next) {
+router.get("/aftercolumnsort", function (req, res, next) {
   let sort = {
     column: req.query.column,
     order: req.query.order
@@ -168,14 +162,16 @@ router.get("/aftercolumnsort", function(req, res, next) {
   if (sort.column !== 'undefined') {
     if (sort.order === 'true') {
       sort.order = 'ASC'
-    } else if ( sort.order === 'false') {
+    } else if (sort.order === 'false') {
       sort.order = 'DESC'
     } else {
       sort.order = ''
     }
-  } 
+  }
 })
-router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
+
+
+router.post("/aftercolumnsort", jsonParser, function (req, res, next) {
   var tmp = req.body;
   var tempCol = [];
   var indexes = [];
@@ -187,7 +183,7 @@ router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
     for (var i in tempCol) {
       tempColIndexes.push([tempCol[i], i]);
     }
-    tempColIndexes.sort(function(left, right) {
+    tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
     var temp = [];
@@ -200,7 +196,7 @@ router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
     for (var i in tempCol) {
       tempColIndexes.push([tempCol[i], i]);
     }
-    tempColIndexes.sort(function(left, right) {
+    tempColIndexes.sort(function (left, right) {
       return left[0] < right[0] ? -1 : 1;
     });
     var temp = [];
@@ -223,11 +219,11 @@ router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
 
   var tempCol = [];
   var indexes = [];
-  
-  db.serialize(function() {
+
+  db.serialize(function () {
     db.all("SELECT * FROM `data` ORDER BY " + sort.column + " " + sort.order, (err, rows) => {
       if (rows) {
-        res.json({data: rows})
+        res.json({ data: rows })
       }
     })
   })
@@ -243,7 +239,7 @@ router.post("/aftercolumnsort", jsonParser, function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{columns:array,target:number}}} req.body
  */
-router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
+router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
   var colMoved = req.body;
 
   var columns = colMoved.columns;
@@ -262,7 +258,7 @@ router.post("/aftercolumnmove", jsonParser, function(req, res, next) {
 });
 
 
-router.get("/afterfilter", jsonParser, function(req, res, next) {
+router.get("/afterfilter", jsonParser, function (req, res, next) {
   var queries = req.query
   let dbQuery = 'SELECT * FROM \`data\` WHERE '
   for (let query in queries) {
@@ -279,10 +275,10 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
           dbQuery += "`" + col_name + "` IS NOT NULL"
           break;
         case "eq":
-          dbQuery += "`" + col_name + "` LIKE '" + params + "'" 
+          dbQuery += "`" + col_name + "` LIKE '" + params + "'"
           break;
         case "neq":
-          dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'" 
+          dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'"
           break;
         case "by_value":
           if (typeof params === 'string') {
@@ -318,7 +314,7 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
           i++
         }
       }
-      var lastKey = Object.keys(queries)[Object.keys(queries).length-1]
+      var lastKey = Object.keys(queries)[Object.keys(queries).length - 1]
       if (col_name !== lastKey) {
         dbQuery += " and "
       }
@@ -326,13 +322,14 @@ router.get("/afterfilter", jsonParser, function(req, res, next) {
   }
   db.serialize(() => {
     db.all(dbQuery, (err, rows) => {
-      res.json({data: rows || []})
+      res.json({ data: rows || [] })
     })
   })
 })
 
-router.get("/settings", jsonParser, function(req, res, next) {
+router.get("/settings", jsonParser, function (req, res, next) {
   res.json({ data: settings });
 });
+
 //TODO onDestroy => dataAtBeginning = data or smth like this
 module.exports = router;
