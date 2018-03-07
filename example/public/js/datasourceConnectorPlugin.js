@@ -48,11 +48,11 @@ dataSourceConnectorPlugin.prototype.afterInit = false
  * Enable the plujgin.
  */
 dataSourceConnectorPlugin.prototype.enablePlugin = function() {
-  if (!this.afterInit) {
+  // if (!this.afterInit) {
     this.addHook("afterInit", this.onAfterInit.bind(this));
     this.addHook("beforeColumnSort", this.onBeforeColumnSort.bind(this));
     this.addHook("afterColumnSort", this.onAfterColumnSort.bind(this));
-  }
+  // }
   this.addHook("afterChange", this.onAfterChange.bind(this));
   this.addHook("afterRender", this.onAfterRender.bind(this));
   this.addHook("afterCreateRow", this.onAfterCreateRow.bind(this));
@@ -281,11 +281,27 @@ dataSourceConnectorPlugin.prototype.onAfterColumnSort = function(
   query = query.slice(0, -1)
 
   dataSourceConnectorPlugin._getData(controllerUrl + "/aftercolumnsort" + query, response => {
-    data = response.data
+    var res = response.data
+    var data = []
+    for (var rowId = 0; rowId < res.length; rowId++) {
+      var row =[]
+      for (var columnName in res[rowId]) {
+        row.push(res[rowId][columnName])
+      }
+      data.push(row)
+    }
     this.hot.loadData(data)
-    return false;
+    var columns = []
+    for (var columnName in res[0]) {
+      columns.push(columnName)
+    }
+    for (var rowId = 0; rowId < res.length; rowId++) {
+      for (var columnId = 0 ; columnId < columns.length; columnId++) {
+        this.hot.setCellMeta(rowId, columnId, "row_id", res[rowId][response.rowId]);
+        this.hot.setCellMeta(rowId, columnId, "col_id", columns[columnId]);
+      }
+    }
   })
-  return false;
 };
 
 /**

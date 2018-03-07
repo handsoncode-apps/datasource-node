@@ -12,6 +12,7 @@ var settings = {
   rowHeaders: true,
   colHeaders: true,
   datasourceConnectorPlugin: true,
+  columnSorting: true,
 
   contextMenu: true,
   manualColumnMove: true,
@@ -155,7 +156,6 @@ router.get("/aftercolumnsort", function (req, res, next) {
     column: req.query.column,
     order: req.query.order
   }
-
   if (sort.column !== 'undefined') {
     if (sort.order === 'true') {
       sort.order = 'ASC'
@@ -165,57 +165,6 @@ router.get("/aftercolumnsort", function (req, res, next) {
       sort.order = ''
     }
   }
-})
-
-
-router.post("/aftercolumnsort", jsonParser, function (req, res, next) {
-  var tmp = req.body;
-  var tempCol = [];
-  var indexes = [];
-  for (var i = 0; i < data.length; i++) {
-    tempCol.push(data[i].values[tmp.column]);
-  }
-  if (tmp.order) {
-    var tempColIndexes = [];
-    for (var i in tempCol) {
-      tempColIndexes.push([tempCol[i], i]);
-    }
-    tempColIndexes.sort(function (left, right) {
-      return left[0] < right[0] ? -1 : 1;
-    });
-    var temp = [];
-    for (var j in tempColIndexes) {
-      temp.push(tempColIndexes[j][0]);
-      indexes.push(tempColIndexes[j][1]);
-    }
-  } else if (!tmp.order) {
-    var tempColIndexes = [];
-    for (var i in tempCol) {
-      tempColIndexes.push([tempCol[i], i]);
-    }
-    tempColIndexes.sort(function (left, right) {
-      return left[0] < right[0] ? -1 : 1;
-    });
-    var temp = [];
-    for (var j in tempColIndexes) {
-      temp.push(tempColIndexes[j][0]);
-      indexes.push(tempColIndexes[j][1]);
-    }
-    indexes.reverse();
-  }
-  var sortedData = [];
-  for (var i = 0; i < indexes.length; i++) {
-    sortedData.push({
-      key: data[indexes[i]].key,
-      values: data[indexes[i]].values
-    });
-  }
-  //  else {
-  //   res.json({data: []})
-  // }
-
-  var tempCol = [];
-  var indexes = [];
 
   db.serialize(function () {
     db.all("SELECT * FROM `data` ORDER BY " + sort.column + " " + sort.order, (err, rows) => {
@@ -224,13 +173,7 @@ router.post("/aftercolumnsort", jsonParser, function (req, res, next) {
       }
     })
   })
-
-  data = sortedData;
-  if (tmp.order == undefined) {
-    data = dataAtBeginning;
-  }
-  res.json({ data: data });
-});
+})
 
 /**
  * @param {{e.RequestHandler}} jsonParser
