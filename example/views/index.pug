@@ -1,0 +1,30 @@
+extends layout
+
+block content
+  h1 Example
+  div(id="hot")
+  table(id="log")
+    thead
+      tr
+        th Method
+        th URL
+        th Payload
+        th Data
+        th status
+  script.
+    var container = document.getElementById('hot');
+
+    var hot = new Handsontable(container, {
+        dataSourceConnector: {
+            controllerUrl: '/users'
+        },
+    });
+
+block scripts
+  script(src='https://docs.handsontable.com/pro/1.17.0/bower_components/handsontable-pro/dist/handsontable.full.min.js')
+  script(src='/js/datasourceConnectorPlugin.js')
+  
+block css
+  link(rel='stylesheet', href='https://docs.handsontable.com/pro/1.17.0/bower_components/handsontable-pro/dist/handsontable.full.min.css')
+
+

@@ -16,9 +16,6 @@ var settings = {
   contextMenu: true,
   manualColumnMove: true,
   manualRowMove: true,
-  columnSorting: {
-    column: 1
-  },
   sortIndicator: true,
   filters: true,
   dropdownMenu: true,
@@ -89,9 +86,9 @@ router.post("/afterchange", jsonParser, function (req, res, next) {
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row
     let meta = changes[i].meta
-    db.serialize(function (error) {
-      db.run("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
-    })
+    
+    db.run("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
+    
     let data = [changes[i].row, changes[i].column, JSON.stringify(meta)];
     db.run("INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)", data, function (err) {
       if (err) {
@@ -329,6 +326,10 @@ router.get("/afterfilter", jsonParser, function (req, res, next) {
 
 router.get("/settings", jsonParser, function (req, res, next) {
   res.json({ data: settings });
+});
+
+router.get("/", function(req, res){
+  res.render('index')
 });
 
 //TODO onDestroy => dataAtBeginning = data or smth like this

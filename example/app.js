@@ -9,17 +9,10 @@ var port = 3005
 
 app.use(logger('dev'))
 app.use(bodyParser.json())
-
-app.use(function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT')
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
-
-  // Pass to next layer of middleware
-  next()
-})
+app.set('view engine', 'pug')
 
 app.use('/users', users)
+app.use(express.static('public'))
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
