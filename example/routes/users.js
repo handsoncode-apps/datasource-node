@@ -141,7 +141,14 @@ router.post("/aftercreatecol", jsonParser, function (req, res, next) {
  * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
  */
 router.get("/data", function (req, res, next) {
-  db.all("SELECT * FROM `data`", (err, rows) => {
+  let dbQuery = "SELECT * FROM `data`"
+  if (req.query.hasOwnProperty('filter')) {
+    dbQuery += " WHERE " + queryFilter(req.query)
+  }
+  if (req.query.hasOwnProperty('sort')) {
+    dbQuery += querySort(req.query)
+  }
+  db.all(dbQuery, (err, rows) => {
     res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
   });
 });
@@ -151,56 +158,19 @@ router.get("/data", function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
  */
-router.get("/aftercolumnsort", function (req, res, next) {
-  let sort = {
-    column: req.query.column,
-    order: req.query.order
+
+function querySort(query) {
+  let dbQuery = ''
+  if (query.order === 'true') {
+    dbQuery += " ORDER BY `" + query.column + "` ASC"
+  } else if (query.order === 'false') {
+    dbQuery += " ORDER BY `" + query.column + "` DESC"
   }
-  if (sort.column !== 'undefined') {
-    if (sort.order === 'true') {
-      sort.order = 'ASC'
-    } else if (sort.order === 'false') {
-      sort.order = 'DESC'
-    } else {
-      sort.order = ''
-    }
-  }
+  return dbQuery
+}
 
-  db.serialize(function () {
-    db.all("SELECT * FROM `data` ORDER BY " + sort.column + " " + sort.order, (err, rows) => {
-      if (rows) {
-        res.json({ data: rows })
-      }
-    })
-  })
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{tmp:{columns:array,target:number}}} req.body
- */
-router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
-  var colMoved = req.body;
-
-  var columns = colMoved.columns;
-  var position = colMoved.target;
-
-  var begin = colOrder
-    .slice(0, position)
-    .filter(x => columns.indexOf(x) === -1);
-  var end = colOrder.slice(position).filter(x => columns.indexOf(x) === -1);
-
-  colOrder = begin;
-  colOrder = colOrder.concat(columns);
-  colOrder = colOrder.concat(end);
-
-  res.json({ data: colOrder });
-});
-
-
-router.get("/afterfilter", jsonParser, function (req, res, next) {
-  var queries = req.query
-  let dbQuery = 'SELECT * FROM \`data\` WHERE '
+function queryFilter(queries) {
+  let dbQuery = ''
   for (let query in queries) {
     var col_name = query
     let options = queries[query]
@@ -254,18 +224,32 @@ router.get("/afterfilter", jsonParser, function (req, res, next) {
           i++
         }
       }
-      var lastKey = Object.keys(queries)[Object.keys(queries).length - 1]
-      if (col_name !== lastKey) {
-        dbQuery += " and "
-      }
     }
   }
-  db.serialize(() => {
-    db.all(dbQuery, (err, rows) => {
-      res.json({ data: rows || [] })
-    })
-  })
-})
+  return dbQuery
+}
+
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{tmp:{columns:array,target:number}}} req.body
+ */
+router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
+  var colMoved = req.body;
+
+  var columns = colMoved.columns;
+  var position = colMoved.target;
+
+  var begin = colOrder
+    .slice(0, position)
+    .filter(x => columns.indexOf(x) === -1);
+  var end = colOrder.slice(position).filter(x => columns.indexOf(x) === -1);
+
+  colOrder = begin;
+  colOrder = colOrder.concat(columns);
+  colOrder = colOrder.concat(end);
+
+  res.json({ data: colOrder });
+});
 
 router.get("/settings", jsonParser, function (req, res, next) {
   res.json({ data: settings });

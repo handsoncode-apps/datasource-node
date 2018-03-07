@@ -66,6 +66,7 @@ dataSourceConnectorPlugin.prototype.enablePlugin = function() {
 
 dataSourceConnectorPlugin.prototype.data = []
 dataSourceConnectorPlugin.prototype.colHeaders = []
+dataSourceConnectorPlugin.prototype.currentFilter
 
 /**
  * Disable the plugin.
@@ -274,13 +275,17 @@ dataSourceConnectorPlugin.prototype.onAfterColumnSort = function(
 ) {
   var controllerUrl = this.hot.getSettings().dataSourceConnector.controllerUrl;
   var params = { column: this.colHeaders[column], order: order }
-  var query = '?'
+  var query = '?sort&'
   for (var key in params) {
    query += key + "=" + params[key] + "&"
   }
-  query = query.slice(0, -1)
+  if (this.hot.currentFilter) {
+    console.log('this.hot.currentFilter', this.hot.currentFilter)
+    query += this.hot.currentFilter
+    console.log('query', query)
+  }
 
-  dataSourceConnectorPlugin._getData(controllerUrl + "/aftercolumnsort" + query, response => {
+  dataSourceConnectorPlugin._getData(controllerUrl + "/data" + query, response => {
     var res = response.data
     var data = []
     for (var rowId = 0; rowId < res.length; rowId++) {
@@ -409,11 +414,14 @@ dataSourceConnectorPlugin.prototype.onAfterFilter = function(
           queryArr.push("[" + this.colHeaders[conditionsStack[i].column] + "][operator]=" + tempOperator)
         }
       }
-      operatorWithVariable = false
+      if (i < conditionsStack.length - 1 && conditionsStack.length > 1) {
+        queryArr.push("[" + this.colHeaders[conditionsStack[i].column] + "][operator]=and")
+      }
     }
-    var query = "?" + queryArr.join('&')
+    var query = "?filter&" + queryArr.join('&')
+    this.hot.currentFilter = "filter&" + queryArr.join('&')
     var controllerUrl = this.hot.getSettings().dataSourceConnector.controllerUrl;
-    dataSourceConnectorPlugin._getData(controllerUrl + "/afterfilter" + query, response => {
+    dataSourceConnectorPlugin._getData(controllerUrl + "/data" + query, response => {
       var data = response.data
       var newData = []
       for (var i = 0; i < data.length; i++) {
