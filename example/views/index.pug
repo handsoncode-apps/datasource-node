@@ -10,13 +10,18 @@ block content
         th URL
         th Payload
         th Data
-        th status
   script.
     var container = document.getElementById('hot');
     
     var hot = new Handsontable(container, {
         dataSourceConnector: {
-          controllerUrl: '/users'
+          controllerUrl: '/users',
+          onDataSend : function(data){
+            var element = document.getElementById("log");
+            var newRow = document.createElement("tr")
+            newRow.innerHTML="<td>" + data.request.method + "</td><td>" + data.request.url + "</td><td>" + data.request.body + "</td><td>" + JSON.stringify(data.response) + "</td>";
+            element.insertBefore(newRow, element.firstChild);
+          }
         },
     });
 block scripts
