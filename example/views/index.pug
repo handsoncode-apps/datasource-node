@@ -13,18 +13,18 @@ block content
         th status
   script.
     var container = document.getElementById('hot');
-
+    
     var hot = new Handsontable(container, {
         dataSourceConnector: {
             controllerUrl: '/users'
         },
     });
-
+    Handsontable.plugins.registerPlugin('dataSourceConnectorPlugin', DatasourceConector)
 block scripts
-  script(src='https://docs.handsontable.com/pro/1.17.0/bower_components/handsontable-pro/dist/handsontable.full.min.js')
-  script(src='/js/datasourceConnectorPlugin.js')
+  script(src='/js/handsontable.full.js')
+  script(src='/js/datasource-connector.js')
   
 block css
-  link(rel='stylesheet', href='https://docs.handsontable.com/pro/1.17.0/bower_components/handsontable-pro/dist/handsontable.full.min.css')
+  link(rel='stylesheet', href='/js/handsontable.full.css')
 
 
