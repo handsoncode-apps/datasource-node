@@ -16,10 +16,9 @@ block content
     
     var hot = new Handsontable(container, {
         dataSourceConnector: {
-            controllerUrl: '/users'
+          controllerUrl: '/users'
         },
     });
-    Handsontable.plugins.registerPlugin('dataSourceConnectorPlugin', DatasourceConector)
 block scripts
   script(src='https://docs.handsontable.com/pro/1.18.0/bower_components/handsontable-pro/dist/handsontable.full.js')
   script(src='/js/datasource-connector.js')
