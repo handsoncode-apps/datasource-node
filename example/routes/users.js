@@ -3,6 +3,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var router = express.Router();
 
+let URI = require("./utils/uri")
+
 // create application/json parser
 var jsonParser = bodyParser.json();
 
@@ -142,8 +144,11 @@ router.post("/aftercreatecol", jsonParser, function (req, res, next) {
  */
 router.get("/data", function (req, res, next) {
   let dbQuery = "SELECT * FROM `data`"
-  if (req.query.hasOwnProperty('filter')) {
-    dbQuery += " WHERE " + queryFilter(req.query)
+
+  if (req.query.hasOwnProperty('filters')) {
+    let uri = new URI(req.query)
+    uri.dbString()
+    // dbQuery += " WHERE " + queryFilter(req.query)
   }
   if (req.query.hasOwnProperty('sort')) {
     dbQuery += querySort(req.query)
