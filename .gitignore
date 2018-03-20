@@ -1,16 +1,8 @@
 .DS_Store
 
-client/node_modules/
-server/node_modules/
-
 *.orig
 example/node_modules/
-/client/package-lock.json
 /example/package-lock.json
-/package-lock.json
-/server/package-lock.json
-/example/database.db
-/node_modules/sqlite3/lib/binding/node-v57-win32-x64/node_sqlite3.node
 /example/database.db
 /node_modules/
 /example/public/js/

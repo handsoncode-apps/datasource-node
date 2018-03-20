@@ -128,11 +128,16 @@ router.post("/aftercreaterow", jsonParser, function (req, res, next) {
  */
 router.post("/aftercreatecol", jsonParser, function (req, res, next) {
   var createCol = req.body;
-  colNames.splice(createCol.index, 0, "");
+  colOrder.splice(createCol.index, 0, "");
   db.serialize(function () {
-    let stmt = db.prepare("alter table `data` add column testy TEXT")
-    stmt.run()
-    stmt.finalize()
+    let stmt = db.prepare("ALTER TABLE `data` ADD COLUMN testy TEXT")
+    stmt.run(function(err) {
+      stmt.finalize()
+      if (!err) {
+        res.json({colIndex: createCol.index, colOrder: colOrder})
+      }
+    })
+
   })
 });
 
