@@ -6,8 +6,6 @@ var router = express.Router();
 // create application/json parser
 var jsonParser = bodyParser.json();
 
-var data = [];
-
 var settings = {
   rowHeaders: true,
   colHeaders: true,
@@ -21,9 +19,8 @@ var settings = {
   filters: true,
   dropdownMenu: true,
 };
-var cellMeta = [];
+
 var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
-var dataAtBeginning = data;
 
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./database.db", function (data) {
@@ -87,9 +84,9 @@ router.post("/afterchange", jsonParser, function (req, res, next) {
   for (let i = 0; i < changes.length; i++) {
     let rowId = changes[i].row
     let meta = changes[i].meta
-    
+
     db.run("UPDATE `data` SET " + changes[i].column + " = '" + changes[i].newValue + "' WHERE id = '" + rowId + "'");
-    
+
     let data = [changes[i].row, changes[i].column, JSON.stringify(meta)];
     db.run("INSERT INTO `cellMeta` ('rowId', 'colId', 'meta') VALUES (?, ?, ?)", data, function (err) {
       if (err) {
@@ -113,8 +110,7 @@ router.post("/afterchange", jsonParser, function (req, res, next) {
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
  */
 router.post("/aftercreaterow", jsonParser, function (req, res, next) {
-  var createRow = req.body;
-  var values = [];
+  // TODO: fix this var createRow = req.body;
   db.serialize(function () {
     let stmt = db.prepare("INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES ('', '', '', '', '')")
     stmt.run()
