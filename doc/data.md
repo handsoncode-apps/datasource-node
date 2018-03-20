@@ -126,11 +126,6 @@ router.get('/data', function (req, res, next) {
 })
 ```
 
-req.query is an object defined by schema:
+Where `column` is string and `order` is `ASC` or `DESC`. Both parameters will be passed by `datasource-connector` in the same time.
 
-```javascript 
-   { 
-     column:string,
-     order:ASC|DESC|null
-   }
-```
+Data sorting and filtering may be provided to backend in the same time, but it is not necessary. 
