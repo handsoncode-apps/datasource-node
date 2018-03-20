@@ -141,93 +141,14 @@ router.post("/aftercreatecol", jsonParser, function (req, res, next) {
  * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
  */
 router.get("/data", function (req, res, next) {
-  let dbQuery = "SELECT * FROM `data`"
-  if (req.query.hasOwnProperty('filter')) {
-    dbQuery += " WHERE " + queryFilter(req.query)
-  }
-  if (req.query.hasOwnProperty('sort')) {
-    dbQuery += querySort(req.query)
-  }
+  let QueryBuilder = require("../utils/queryBuilder")
+  let queryBuilder = new QueryBuilder(req.query)
+  let dbQuery = queryBuilder.buildQuery("SELECT * FROM `data`")
+
   db.all(dbQuery, (err, rows) => {
     res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
   });
 });
-
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
- */
-
-function querySort(query) {
-  let dbQuery = ''
-  if (query.order === 'true') {
-    dbQuery += " ORDER BY `" + query.column + "` ASC"
-  } else if (query.order === 'false') {
-    dbQuery += " ORDER BY `" + query.column + "` DESC"
-  }
-  return dbQuery
-}
-
-function queryFilter(queries) {
-  let dbQuery = ''
-  for (let query in queries) {
-    var col_name = query
-    let options = queries[query]
-    let i = 0
-    for (let option in options) {
-      let params = options[option]
-      switch (option) {
-        case "empty":
-          dbQuery += "`" + col_name + "` IS NULL"
-          break;
-        case "not_empty":
-          dbQuery += "`" + col_name + "` IS NOT NULL"
-          break;
-        case "eq":
-          dbQuery += "`" + col_name + "` LIKE '" + params + "'"
-          break;
-        case "neq":
-          dbQuery += "`" + col_name + "` NOT LIKE '" + params + "'"
-          break;
-        case "by_value":
-          if (typeof params === 'string') {
-            dbQuery += "`" + col_name + "` = '" + params + "'"
-          } else {
-            dbQuery += "`" + col_name + "` IN ("
-            for (let i = 0; i < params.length; i++) {
-              dbQuery += "'" + params[i] + "',"
-            }
-            dbQuery = dbQuery.slice(0, -1)
-            dbQuery += ")"
-          }
-          break;
-        case "begins_with":
-          dbQuery += "`" + col_name + "` LIKE '" + params + "%' "
-          break;
-        case "ends_with":
-          dbQuery += "`" + col_name + "` LIKE '%" + params + "' "
-          break;
-        case "contains":
-          dbQuery += "`" + col_name + "` LIKE '%" + params + "%' "
-          break;
-        case "not_contains":
-          dbQuery += "`" + col_name + "` NOT LIKE '%" + params + "%' "
-          break;
-      }
-      if (option !== 'operator' && options.operator && i < options.operator.length) {
-        if (typeof options.operator === 'string') {
-          dbQuery += " " + options.operator
-          i = options.operator.length
-        } else {
-          dbQuery += " " + options.operator[i] + " "
-          i++
-        }
-      }
-    }
-  }
-  return dbQuery
-}
 
 /**
  * @param {{e.RequestHandler}} jsonParser
