@@ -113,10 +113,18 @@ router.post("/aftercreaterow", jsonParser, function (req, res, next) {
   // TODO: fix this var createRow = req.body;
   db.serialize(function () {
     let stmt = db.prepare("INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES ('', '', '', '', '')")
-    stmt.run()
+    stmt.run(function(error){
+      if (!error){
+        db.get("SELECT * from `data` where id= ?",this.lastID,function(error,row){
+          res.json({data:row, id:row.id});
+        })
+      }
+    })
     stmt.finalize()
   })
 });
+
+var num = 0;
 
 /**
  * @param {{e.RequestHandler}} jsonParser
@@ -124,13 +132,14 @@ router.post("/aftercreaterow", jsonParser, function (req, res, next) {
  */
 router.post("/aftercreatecol", jsonParser, function (req, res, next) {
   var createCol = req.body;
-  colOrder.splice(createCol.index, 0, "");
+  num++;
+  colOrder.splice(createCol.index, 0, 'dynamic_' + num);
   db.serialize(function () {
-    let stmt = db.prepare("ALTER TABLE `data` ADD COLUMN testy TEXT")
+    let stmt = db.prepare("ALTER TABLE `data` ADD COLUMN dynamic_" + num + " TEXT")
     stmt.run(function(err) {
       stmt.finalize()
       if (!err) {
-        res.json({colIndex: createCol.index, colOrder: colOrder})
+        res.json({name: 'dynamic_' + num})
       }
     })
 
@@ -158,7 +167,7 @@ router.get("/data", function (req, res, next) {
 router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
   var colMoved = req.body;
 
-  var columns = colMoved.columns;
+/*  var columns = colMoved.columns;
   var position = colMoved.target;
 
   var begin = colOrder
@@ -168,7 +177,7 @@ router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
 
   colOrder = begin;
   colOrder = colOrder.concat(columns);
-  colOrder = colOrder.concat(end);
+  colOrder = colOrder.concat(end);*/
 
   res.json({ data: colOrder });
 });
