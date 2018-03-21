@@ -34,21 +34,19 @@ var data = [
     values: ["2020", 10, 11, 14, 12, 15, 16]
   }
 ];
-var colNames = ["year", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"];
-var colOrder = [0, 1, 2, 3, 4, 5, 6];
 
 ```
-**data** is an array of objects that represent each row in table. Objects have two properties: 
-```
+
+**data** is an array of objects that represent each row in table. Objects have two properties:
+
+```javascript
 {
-    key: int | string,
+    key: string
     values: any
 }
-``` 
+```
 
-**colNames** is an array of strings (columns names).
-
-**colOrder** is an array of numbers (columns indexes that starts with 0 index).
+**colOrder** is an array of strings (columns indexes that starts with 0 index).
 
 ## Data filtering
 
@@ -70,7 +68,8 @@ router.get('/data', function (req, res, next) {
     column: string
     conditions: array
   }
-```  
+``` 
+
 `conditions` property is an array of objects defined by schema:
 
 ```javascript
@@ -128,4 +127,4 @@ router.get('/data', function (req, res, next) {
 
 Where `column` is string and `order` is `ASC` or `DESC`. Both parameters will be passed by `datasource-connector` in the same time.
 
-Data sorting and filtering may be provided to backend in the same time, but it is not necessary. 
+Data sorting and filtering may be provided to backend in the same time, but it is not necessary.
