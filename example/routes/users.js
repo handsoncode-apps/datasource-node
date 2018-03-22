@@ -20,7 +20,7 @@ var settings = {
   dropdownMenu: true,
 };
 
-var colOrder = ["first_name", "last_name", "age", "sex", "phone"];
+var colOrder = ["id","first_name", "last_name", "age", "sex", "phone"];
 
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./database.db", function (data) {
@@ -124,7 +124,7 @@ router.post("/aftercreaterow", jsonParser, function (req, res, next) {
   })
 });
 
-var num = 0;
+var num = 0;  
 
 /**
  * @param {{e.RequestHandler}} jsonParser
@@ -167,7 +167,7 @@ router.get("/data", function (req, res, next) {
 router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
   var colMoved = req.body;
 
-/*  var columns = colMoved.columns;
+  var columns = colMoved.columns;
   var position = colMoved.target;
 
   var begin = colOrder
@@ -177,7 +177,7 @@ router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
 
   colOrder = begin;
   colOrder = colOrder.concat(columns);
-  colOrder = colOrder.concat(end);*/
+  colOrder = colOrder.concat(end);
 
   res.json({ data: colOrder });
 });
