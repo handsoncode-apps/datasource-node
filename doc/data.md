@@ -1,4 +1,6 @@
-# Data publishing
+# Data 
+
+## Data publishing for datasource-connector
 
 If you want send data to your frontend hot table please implement this method 
 
@@ -8,49 +10,28 @@ router.get('/data', function (req, res, next) {
 })
 ```
 
-example of data format is 
+The schema of data response is: 
 
 ```javascript
-
-var data = [
-   {
-    key: 5,
-    values: ["2017", 10, 11, 11, 15, 15, 16]
-  },
-  {
-    key: 7,
-    values: ["2018", 13, 11, 12, 14, 15, 16]
-  },
-  {
-    key: 11,
-    values: ["2019", 10, 11, 13, 9, 15, 16]
-  },
-  {
-    key: 13,
-    values: ["2020", 10, 11, 14, 12, 15, 16]
-  },
-  {
-    key: 15,
-    values: ["2020", 10, 11, 14, 12, 15, 16]
-  }
-];
-var colNames = ["year", "Tesla", "Nissan", "Toyota", "Honda", "Mazda", "Ford"];
-var colOrder = [0, 1, 2, 3, 4, 5, 6];
-
-```
-**data** is an array of objects that represent each row in table. Objects have two properties: 
-```
 {
-    key: int | string,
-    values: any
+  "data": [
+    {"key1":value1,"key2":value2 (..)}
+    ],
+  "rowId":"id"
 }
-``` 
+```
+Where:
 
-**colNames** is an array of strings (columns names).
+`Data` is an array of object represents each row:
 
-**colOrder** is an array of numbers (columns indexes that starts with 0 index).
+- `key1`, `key2` - Database names of column name 
+- `value1`, `value2` -  Database values for each cell
 
-## Data filtering
+There may be more columns in this object, but all need to have unique name.
+
+`rowId` is the of unique id column name.
+
+## Filtering
 
 You can filter passed data by columns and get object that is an array of objects handling information about filtered columns and methods of filtering. 
 
@@ -113,7 +94,7 @@ args:
 ```    
 
 
-## Data sorting
+## Sorting
 
 You can sort passed data by columns and get object handling information about sorted columns.
 
@@ -126,6 +107,6 @@ router.get('/data', function (req, res, next) {
 })
 ```
 
-Where `column` is string and `order` is `ASC` or `DESC`. Both parameters will be passed by `datasource-connector` in the same time.
+Where `column` is string and `order` is Boolean with true if Ascending. Both parameters will be passed by `datasource-connector` in the same time.
 
 Data sorting and filtering may be provided to backend in the same time, but it is not necessary. 
