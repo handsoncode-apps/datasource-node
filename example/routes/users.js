@@ -124,7 +124,7 @@ router.post("/aftercreaterow", jsonParser, function (req, res, next) {
   })
 });
 
-var num = 0;  
+var num = 0;
 
 /**
  * @param {{e.RequestHandler}} jsonParser
