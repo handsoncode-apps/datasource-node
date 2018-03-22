@@ -18,6 +18,7 @@ The schema of data response is:
     {"key1":value1,"key2":value2 (..)}
     ],
   "rowId":"id"
+
 }
 ```
 Where:
@@ -51,7 +52,8 @@ router.get('/data', function (req, res, next) {
     column: string
     conditions: array
   }
-```  
+``` 
+
 `conditions` property is an array of objects defined by schema:
 
 ```javascript
@@ -109,4 +111,4 @@ router.get('/data', function (req, res, next) {
 
 Where `column` is string and `order` is Boolean with true if Ascending. Both parameters will be passed by `datasource-connector` in the same time.
 
-Data sorting and filtering may be provided to backend in the same time, but it is not necessary. 
+Data sorting and filtering may be provided to backend in the same time, but it is not necessary.
