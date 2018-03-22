@@ -150,9 +150,9 @@ router.post("/aftercreatecol", jsonParser, function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
  */
-router.get("/data", function (req, res, next) {
+router.post("/data", jsonParser, function (req, res, next) {
   let QueryBuilder = require("../utils/queryBuilder")
-  let queryBuilder = new QueryBuilder(req.query)
+  let queryBuilder = new QueryBuilder(req.body)
   let dbQuery = queryBuilder.buildQuery("SELECT * FROM `data`")
 
   db.all(dbQuery, (err, rows) => {

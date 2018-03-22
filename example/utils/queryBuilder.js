@@ -69,15 +69,17 @@ module.exports = class QueryBuilder {
   }
 
   _buildOrderClause() {
-    if (!this.query.hasOwnProperty('order')) {
+    if (!this.query.hasOwnProperty('order') || this.query.order === undefined || this.query.order === {}) {
       return '';
     }
 
+    console.log(this.query);
+
     let dbQuery = ''
-    if (this.query.order === 'true') {
-      dbQuery += ' ORDER BY `' + this.query.column + '` ASC'
-    } else if (this.query.order === 'false') {
-      dbQuery += ' ORDER BY `' + this.query.column + '` DESC'
+    if (this.query.order.order === 'ASC') {
+      dbQuery += ' ORDER BY `' + this.query.order.column + '` ASC'
+    } else if (this.query.order === 'DESC') {
+      dbQuery += ' ORDER BY `' + this.query.order.column + '` DESC'
     }
     return dbQuery
   }
