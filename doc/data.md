@@ -39,7 +39,7 @@ You can filter passed data by columns and get object that is an array of objects
 ```javascript
 router.get('/data', function (req, res, next) {
   // save filters for usage
-  var filters = req.query.filters
+  var filters = req.body.filters
   // TODO implement your code here
   res.json(data)
 })
@@ -79,11 +79,11 @@ Possible values of `name` property:
 ```json
 args:
     [
-      {
-        "[0]": "chosen value 1",
-        "[1]": "chosen value 2",
-        "[2]": "chosen value 3"
-      }
+      [
+        "chosen value 1",
+        "chosen value 2",
+        "chosen value 3"
+      ]
     ]
 ```    
 On any other `name` value, `args` array contains single string element.Example:
@@ -103,12 +103,20 @@ You can sort passed data by columns and get object handling information about so
 ```javascript
 router.get('/data', function (req, res, next) {
   // save columns and order for usage
-  var sortedColumn = req.column
-  var columnOrder = req.order
+  var order = req.body.order
   res.json(data)
 })
 ```
 
-Where `column` is string and `order` is Boolean with true if Ascending. Both parameters will be passed by `datasource-connector` in the same time.
+`order` is an object defined by schema:
+
+```javascript
+  {
+    column: string
+    order: ASC|DESC
+  }
+```
+
+Where `column` is string and `order` is ASC string for ascending order or DESC for descending. Both parameters will be passed by `datasource-connector` in the same time.
 
 Data sorting and filtering may be provided to backend in the same time, but it is not necessary.
