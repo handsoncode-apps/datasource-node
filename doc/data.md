@@ -40,6 +40,7 @@ You can filter passed data by columns and get object that is an array of objects
 router.get('/data', function (req, res, next) {
   // save filters for usage
   var filters = req.body.filters
+  var conditions = req.body.conditions
   // TODO implement your code here
   res.json(data)
 })

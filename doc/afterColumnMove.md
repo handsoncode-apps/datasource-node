@@ -3,7 +3,7 @@
 You need to create method that will catch the POST "/aftercolumnmove" url with body param `tmp` object, and should return `200` OK HTTP response. 
 
 ```javascript
-router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
+router.post('/move/column', jsonParser, function (req, res, next) {
   var colMoved = req.body
 
   // TODO  insert implementation here

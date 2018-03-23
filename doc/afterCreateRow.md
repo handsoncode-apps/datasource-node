@@ -3,7 +3,7 @@
 You need to create method that will catch the POST "/aftercreaterow" url with body param `createRow` object, and should return `200` OK HTTP response. 
 
 ```javascript
-router.post('/aftercreaterow', jsonParser, function (req, res, next) {
+router.post('/create/row', jsonParser, function (req, res, next) {
   var createRow = req.body
 
   // TODO  insert implementation here
