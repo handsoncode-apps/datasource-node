@@ -77,7 +77,7 @@ var db = new sqlite3.Database("./database.db", function (data) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
-router.post("/afterchange", jsonParser, function (req, res, next) {
+router.post("/update", jsonParser, function (req, res, next) {
 
   let changes = req.body.changes
 
@@ -109,7 +109,7 @@ router.post("/afterchange", jsonParser, function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/aftercreaterow", jsonParser, function (req, res, next) {
+router.post("/create/row", jsonParser, function (req, res, next) {
   // TODO: fix this var createRow = req.body;
   db.serialize(function () {
     let stmt = db.prepare("INSERT INTO `data` (`first_name`, `last_name`,`age`,`sex`,`phone`) VALUES ('', '', '', '', '')")
@@ -130,7 +130,7 @@ var num = 0;
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createCol:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/aftercreatecol", jsonParser, function (req, res, next) {
+router.post("/create/column", jsonParser, function (req, res, next) {
   var createCol = req.body;
   num++;
   colOrder.splice(createCol.index, 0, 'dynamic_' + num);
@@ -164,7 +164,7 @@ router.post("/data", jsonParser, function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{columns:array,target:number}}} req.body
  */
-router.post("/aftercolumnmove", jsonParser, function (req, res, next) {
+router.post("/move/column", jsonParser, function (req, res, next) {
   var colMoved = req.body;
 
   var columns = colMoved.columns;
