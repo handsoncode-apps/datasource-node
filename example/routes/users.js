@@ -20,7 +20,7 @@ var settings = {
   dropdownMenu: true,
 };
 
-var colOrder = ["id","first_name", "last_name", "age", "sex", "phone"];
+var colOrder = []
 
 const sqlite3 = require("sqlite3").verbose();
 var db = new sqlite3.Database("./database.db", function (data) {
@@ -71,6 +71,16 @@ var db = new sqlite3.Database("./database.db", function (data) {
       }
     });
   });
+  db.serialize(function() {
+    db.all("SELECT sql FROM sqlite_master WHERE tbl_name = 'data' AND type = 'table'", (err, rows) => {
+      var regExp = /\w+([^ ]{1,20}) [A-Z]+[,]{0,1}\n/g
+      var colOrders
+      var match
+      while (match = regExp.exec(rows[0].sql)) {
+        colOrder.push(match[0].split(" ")[0])
+      }
+    })
+  })
 })
 
 /**
@@ -189,6 +199,35 @@ router.get("/settings", jsonParser, function (req, res, next) {
 router.get("/", function(req, res){
   res.render('index')
 });
+
+router.post("/remove/column", jsonParser, function (req, res, next) {
+  var colRemoved = req.body
+  for (var i = 0; i < colRemoved.length; i++) {
+    colOrder = colOrder.filter(function(item) { return item !== colRemoved[i] })
+  }
+  var columnsString = ''
+  for (var i = 0; i < colOrder.length; i++) {
+    columnsString += colOrder[i]
+    if (i !== colOrder.length - 1) {
+      columnsString += ", "
+    }
+  }
+  db.serialize(function() {
+    db.run("CREATE TABLE data_temp AS SELECT " + columnsString + " FROM data", function(err) {
+      if (!err) {
+        db.run("DROP TABLE `data`", function(err) {
+          if (!err) {
+            db.run("ALTER TABLE `data_temp` RENAME TO `data`", function(err) {
+              if (!err) {
+                res.json({data: "ok"})
+              }
+            })
+          }
+        })
+      }
+    })
+  })
+})
 
 //TODO onDestroy => dataAtBeginning = data or smth like this
 module.exports = router;
