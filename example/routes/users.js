@@ -124,6 +124,17 @@ router.post("/create/row", jsonParser, function (req, res, next) {
   })
 });
 
+router.post("/remove/row", jsonParser, function(req, res, next) {
+  var removedRows = req.body
+  for (var i = 0; i < removedRows.length; i++) {
+    db.run("DELETE FROM `data` WHERE id = '" + removedRows[i] + "'", function(err, row) {
+      if (err)
+        return console.error(err.message);
+    })
+  }
+  res.json({ data: "ok" });
+})
+
 var num = 0;
 
 /**
