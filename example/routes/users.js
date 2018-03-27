@@ -71,10 +71,10 @@ var db = new sqlite3.Database("./database.db", function (data) {
       }
     });
   });
+  // initialize col names
   db.serialize(function() {
     db.all("SELECT sql FROM sqlite_master WHERE tbl_name = 'data' AND type = 'table'", (err, rows) => {
-      var regExp = /\w+([^ ]{1,20}) [A-Z]+[,]{0,1}\n/g
-      var colOrders
+      var regExp = /([a-z0-9_]{1,20}) [A-Z]+[,]{0,1}/g
       var match
       while (match = regExp.exec(rows[0].sql)) {
         colOrder.push(match[0].split(" ")[0])
