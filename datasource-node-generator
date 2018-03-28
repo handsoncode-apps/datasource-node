@@ -2,86 +2,47 @@
 'use strict'
 
 const fs = require('fs')
+const path = require('path')
 
-var code = `var express = require('express')
-var bodyParser = require('body-parser')
-var router = express.Router()
+var readAndSave = (name, filePath, extension, directory) => {
+  return new Promise(function(resolve, reject) {
+    var x = "";
+    fs.readFile(filePath, 'utf8', function (err,data) {
+      if (err) {
+        console.log("Could not find " + filePath);
+        process.exit(-1)
+      }
+      x = x + data;
 
-// create application/json parser
-var jsonParser = bodyParser.json()
+      if (!fs.existsSync('./' + directory)){
+        fs.mkdirSync('./' + directory)
+      }
 
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{createCol:{index:number,amount:number,source:string}}} req.body
- */
-  router.post('/aftercreatecol', jsonParser, function (req, res, next) {
-
-  // TODO: If you want to use this method implement your code here
-  res.json({'status': 'OK'})
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
- */
-router.post('/afterchange', jsonParser, function (req, res, next) {
-
-  // TODO: If you want to use this method implement your code here
-  res.json({'status': 'OK'})
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{createRow:{index:number,amount:number,source:string}}} req.body
- */
-  router.post('/aftercreaterow', jsonParser, function (req, res, next) {
-
-  // TODO: If you want to use this method implement your code here
-  res.json({'status': 'OK'})
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{tmp:{column:string,order:ASC|DESC|nul}}} req.body
- */
-router.post('/aftercolumnsort', jsonParser, function (req, res, next) {
-
-  // TODO  insert implementation here
-  res.json({'data': 'ok'})
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{tmp:{columns:array,target:number}}} req.body
- */
-router.post('/aftercolumnmove', jsonParser, function (req, res, next) {
-
-  // TODO  insert implementation here
-  res.json({'data': 'ok'})
-})
-
-/**
- * @param {{e.RequestHandler}} jsonParser
- * @param {{sort:[{key:string,values[any]}], filter:[key:string,value:string]}} req.query
- */
-router.get("/data", function(req, res, next) {
-  res.json({ data: data, columns: colNames, colOrder: colOrder });
-});
-
-
-
-module.exports = router
-`
+      var savePath = path.resolve(process.cwd(), directory, name + extension) 
+      fs.writeFile(savePath, x, (err) => {
+        if (err) {
+          console.log('Cannot create file ' + savePath)
+          process.exit(-1)
+        } else {
+          console.log('File ' + name + extension + ' has been created in ' + directory + ' folder in current directory')
+          resolve()
+        }
+      })
+    });
+  })
+}
 
 var generate = (name) => {
   if (name !== '') {
-    fs.writeFile('../routes/' + name + '.js', code, (err) => {
-      if (err) {
-        console.log('Can not create file')
-        program.exit(-1)
-      } else {
-        console.log('File has been created in routes folder')
-      }
+
+    var userPath = path.resolve(__dirname, 'template', 'routes', 'users.js');
+    var indexPath = path.resolve(__dirname, 'template', 'views', 'index.pug');
+    readAndSave(name, userPath, '.js', 'routes').then(() => {
+      readAndSave(name, indexPath, '.pug', 'views').then(() => {
+        console.log('\nAssuming that var app = express() add those two lines to your app.js (server) file:')
+        console.log("\tvar " + name + " = require('./routes/" + name + "')")
+        console.log("\tapp.use('/" + name  + "'," + name + ")")
+      })
     })
   }
 }
