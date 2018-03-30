@@ -138,6 +138,10 @@ router.post("/create/row", jsonParser, function (req, res, next) {
     stmt.run(function(error){
       if (!error){
         db.get("SELECT * from `data` where id= ?",this.lastID,function(error,row){
+          db.all("SELECT MAX(sort_order) FROM `rowOrder`", (err, rowOrder) => {
+            let position = parseInt(rowOrder[0]['MAX(sort_order)']) + 1;
+            db.run("INSERT INTO `rowOrder` (id, sort_order) VALUES ('" + row.id + "', '" + position + "')" )
+          })
           res.json({data:row, id:row.id});
         })
       }
