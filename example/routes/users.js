@@ -166,8 +166,8 @@ router.post("/data", jsonParser, function (req, res, next) {
  */
 router.post("/move/column", jsonParser, function (req, res, next) {
   var colMoved = req.body;
-
-  var columns = colMoved.columns;
+  
+  var columns = colMoved.columnNames;
   var position = colMoved.target;
 
   var begin = colOrder
