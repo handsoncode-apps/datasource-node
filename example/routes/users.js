@@ -37,6 +37,9 @@ var db = new sqlite3.Database("./database.db", function (data) {
         "CREATE TABLE IF NOT EXISTS `cellMeta` (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, rowId TEXT, colId TEXT, meta TEXT)"
       );
       db.run(
+        "CREATE TABLE IF NOT EXISTS `rowOrder` (id INTEGER, sort_order INTEGER)"
+      );
+      db.run(
         "CREATE UNIQUE INDEX IF NOT EXISTS SETTINGS_INDEX ON settings (id)"
       );
       db.run(
@@ -45,6 +48,9 @@ var db = new sqlite3.Database("./database.db", function (data) {
       db.run(
         "CREATE UNIQUE INDEX IF NOT EXISTS USER_INDEX ON cellMeta (rowId, colId)"
       );
+      db.run(
+        "CREATE UNIQUE INDEX IF NOT EXISTS ROW_INDEX on rowOrder (id)"
+      )
     });
   }
   // initailize settings
@@ -78,6 +84,23 @@ var db = new sqlite3.Database("./database.db", function (data) {
       var match
       while (match = regExp.exec(rows[0].sql)) {
         colOrder.push(match[0].split(" ")[0])
+      }
+    })
+  })
+  
+  // initialize row order
+  db.serialize(function() {
+    db.all("SELECT * FROM `rowOrder` LIMIT 1", (err, rows) => {
+      if (rows.length === 0) {
+        db.all("SELECT * FROM `data`", (err, rows) => {
+          let stmt = db.prepare(
+            "INSERT INTO `rowOrder` (`id`, `sort_order`) VALUES (?, ?)"
+          )
+          for (let i = 0; i < rows.length; i++) {
+            stmt.run(rows[i].id, i + 1);
+          }
+          stmt.finalize();
+        })
       }
     })
   })
@@ -126,6 +149,10 @@ router.post("/create/row", jsonParser, function (req, res, next) {
     stmt.run(function(error){
       if (!error){
         db.get("SELECT * from `data` where id= ?",this.lastID,function(error,row){
+          db.all("SELECT MAX(sort_order) FROM `rowOrder`", (err, rowOrder) => {
+            let position = parseInt(rowOrder[0]['MAX(sort_order)']) + 1;
+            db.run("INSERT INTO `rowOrder` (id, sort_order) VALUES ('" + row.id + "', '" + position + "')" )
+          })
           res.json({data:row, id:row.id});
         })
       }
@@ -143,6 +170,38 @@ router.post("/remove/row", jsonParser, function(req, res, next) {
     })
   }
   res.json({ data: "ok" });
+})
+
+/**
+ * @param {{e.RequestHandler}} jsonParser
+ * @param {{rowMove:{rowsMoved:array,target:number}}} req.body
+ */
+router.post("/move/row", jsonParser, function(req, res, next) {
+  let rowMove = req.body;
+  let rowsMoved = rowMove.rowsMoved;
+  let target = rowMove.target;
+  let stmt = db.prepare("UPDATE `rowOrder` SET sort_order=? WHERE id=? ");
+  db.serialize(function() {
+    db.all("SELECT * FROM `rowOrder` ORDER BY sort_order ASC", (err, rows) => {
+      let filtered = [];
+      for (let i = 0; i < rowsMoved.length; i++) {
+        let founded = (rows.find((row) => row.id === rowsMoved[i]));
+        filtered = rows.filter(row => { return row.id !== rowsMoved[i]} );
+        if (founded.sort_order < target) {
+          filtered.splice(target - 1, 0, founded);
+        } else {
+          filtered.splice(target + i, 0, founded);
+        }
+        rows = filtered;
+      }
+      for (let j = 0; j < rows.length; j++) {
+        rows[j].sort_order = j+1
+        stmt.run(rows[j].sort_order, rows[j].id)
+      }
+      stmt.finalize();
+    })
+    res.json({data:'ok'});
+  })
 })
 
 var num = 0;
@@ -174,7 +233,7 @@ router.post("/create/column", jsonParser, function (req, res, next) {
 router.post("/data", jsonParser, function (req, res, next) {
   let QueryBuilder = require("../utils/queryBuilder")
   let queryBuilder = new QueryBuilder(req.body)
-  let dbQuery = queryBuilder.buildQuery("SELECT * FROM `data`")
+  let dbQuery = queryBuilder.buildQuery("SELECT data.* FROM `data` JOIN rowOrder ON data.id = rowOrder.id")
 
   db.all(dbQuery, (err, rows) => {
     res.json({ data: rows, meta: { colOrder: colOrder }, rowId: "id" });
@@ -187,7 +246,7 @@ router.post("/data", jsonParser, function (req, res, next) {
  */
 router.post("/move/column", jsonParser, function (req, res, next) {
   var colMoved = req.body;
-  
+
   var columns = colMoved.columnNames;
   var position = colMoved.target;
 

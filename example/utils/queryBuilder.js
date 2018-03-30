@@ -70,7 +70,7 @@ module.exports = class QueryBuilder {
 
   _buildOrderClause() {
     if (!this.query.hasOwnProperty('order') || this.query.order === undefined || this.query.order === {}) {
-      return '';
+      return ' ORDER BY sort_order '
     }
 
     console.log(this.query);
