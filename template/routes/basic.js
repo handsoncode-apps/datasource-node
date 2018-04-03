@@ -35,7 +35,7 @@ router.post("/remove/row", jsonParser, function(req, res, next) {
  * @param {{rowMove:{rowsMoved:array,target:number}}} req.body
  */
 router.post("/move/row", jsonParser, function(req, res, next) {
-  // TODO: move row action 
+  // TODO: move row action
   res.json({data:'ok'});
 })
 
@@ -44,7 +44,7 @@ router.post("/move/row", jsonParser, function(req, res, next) {
  * @param {{createCol:{index:number,amount:number,source:string}}} req.body
  */
 router.post("/create/column", jsonParser, function (req, res, next) {
-  // TODO: create new row action 
+  // TODO: create new row action
 });
 
 /**
@@ -62,13 +62,13 @@ router.post("/data", jsonParser, function (req, res, next) {
 router.post("/move/column", jsonParser, function (req, res, next) {
   let colOrder = []
 
-  // TODO: columns order action 
+  // TODO: columns order action
   res.json({ data: colOrder });
 });
 
 router.get("/settings", jsonParser, function (req, res, next) {
   let settings = [];
-  // TODO: HOT global settings publishing 
+  // TODO: HOT global settings publishing
   res.json({ data: settings });
 });
 
