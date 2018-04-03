@@ -7,3 +7,5 @@ example/node_modules/
 /node_modules/
 /example/public/js/
 /npm-debug.log
+/test/node_modules
+/test/testapp
