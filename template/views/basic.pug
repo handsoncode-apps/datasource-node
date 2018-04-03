@@ -15,7 +15,7 @@ block content
     
     var hot = new Handsontable(container, {
         dataSourceConnector: {
-          controllerUrl: '/users',
+          controllerUrl: '/basic',
           onDataSend : function(data){
             var element = document.getElementById("log");
             var newRow = document.createElement("tr")
@@ -26,7 +26,7 @@ block content
     });
 block scripts
   script(src='https://docs.handsontable.com/pro/1.18.0/bower_components/handsontable-pro/dist/handsontable.full.js')
-  script(src='/js/datasource-connector.js')
+  script(src='/js/datasource-connector.full.js')
   
 block css
   link(rel='stylesheet', href='https://docs.handsontable.com/pro/1.18.0/bower_components/handsontable-pro/dist/handsontable.min.css')
