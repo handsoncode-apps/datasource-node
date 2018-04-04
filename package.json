@@ -1,15 +1,20 @@
 {
-  "name": "hot-generator",
+  "name": "datasource-node",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	"test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "commander": "^2.14.1",
-    "stream-replace": "^1.0.0"
+    "stream-replace": "^1.0.0",
+	"mocha": "^5.0.5",
+	"chai": "^4.1.2"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2"
   }
 }
