@@ -1,3 +1,8 @@
+/**
+ * Namespace for datascource-node
+ * @namespace datasource
+ */
+
 class QueryBuilder {
   constructor(query) {
     this.query = query
