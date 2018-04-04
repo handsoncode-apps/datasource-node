@@ -1,4 +1,4 @@
-module.exports = class QueryBuilder {
+class QueryBuilder {
   constructor(query) {
     this.query = query
   }
@@ -84,3 +84,42 @@ module.exports = class QueryBuilder {
     return dbQuery
   }
 }
+
+class UpdatedData {
+  constructor() {
+    this.changes = [],
+    this.source = ''
+  }
+}
+
+class CreatedRow {
+  constructor() {
+    this.index = 0,
+    this.amount = 0,
+    this.source = ''
+  }
+}
+
+class CreatedColumn {
+  constructor() {
+    this.index = 0,
+    this.amount = 0,
+    this.source = ''
+  }
+}
+
+class SearchParams {
+  constructor() {
+    this.sort = [],
+    this.filter = []
+  }
+}
+
+class ColumnMoved {
+  constructor() {
+    this.columns = [],
+    this.target = 0
+  }
+}
+
+module.exports = QueryBuilder, UpdatedData, CreatedRow, CreatedColumn, SearchParams, ColumnMoved
