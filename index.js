@@ -100,18 +100,18 @@ class CreatedRow {
   }
 }
 
+class RowMoved {
+  constructor() {
+    this.rowsMoved = [],
+    this.target = 0
+  }
+}
+
 class CreatedColumn {
   constructor() {
     this.index = 0,
     this.amount = 0,
     this.source = ''
-  }
-}
-
-class SearchParams {
-  constructor() {
-    this.sort = [],
-    this.filter = []
   }
 }
 
@@ -122,11 +122,19 @@ class ColumnMoved {
   }
 }
 
+class SearchParams {
+  constructor() {
+    this.sort = [],
+    this.filter = []
+  }
+}
+
 module.exports = {
   QueryBuilder: QueryBuilder,
   UpdatedData: UpdatedData,
   CreatedRow: CreatedRow,
+  RowMoved: RowMoved,
   CreatedColumn: CreatedColumn,
+  ColumnMoved: ColumnMoved,
   SearchParams: SearchParams,
-  ColumnMoved: ColumnMoved
 }
