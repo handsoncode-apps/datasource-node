@@ -122,4 +122,11 @@ class ColumnMoved {
   }
 }
 
-module.exports = QueryBuilder, UpdatedData, CreatedRow, CreatedColumn, SearchParams, ColumnMoved
+module.exports = {
+  QueryBuilder: QueryBuilder,
+  UpdatedData: UpdatedData,
+  CreatedRow: CreatedRow,
+  CreatedColumn: CreatedColumn,
+  SearchParams: SearchParams,
+  ColumnMoved: ColumnMoved
+}
