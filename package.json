@@ -7,6 +7,9 @@
 	"test": "mocha"
   },
   "author": "",
+  "bin":{
+    "datasource-node":"bin/index.js"
+  },
   "license": "ISC",
   "dependencies": {
     "commander": "^2.14.1",

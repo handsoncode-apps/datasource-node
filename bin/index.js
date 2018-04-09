@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#! /usr/bin/env node
 
 'use strict'
 const path = require('path');
@@ -6,7 +6,7 @@ const fs = require('fs');
 const replace = require('stream-replace');
 
 var generate = (name) => {
-  let source = path.resolve(path.join(__dirname,'template','routes'));
+  let source = path.resolve(path.join(__dirname,'..','template','routes'));
   let target = path.resolve(path.join('.','routes'));
 
   if (!fs.existsSync(target)) {
@@ -17,7 +17,7 @@ var generate = (name) => {
     .pipe(replace(/basic/g, name))
     .pipe(fs.createWriteStream(path.format({dir:target, base: name + '.js'})))
 
-  source = path.resolve(path.join(__dirname,'template','views'));
+  source = path.resolve(path.join(__dirname,'..','template','views'));
   target = path.resolve(path.join('.','views'));
 
   if (!fs.existsSync(target)) {
