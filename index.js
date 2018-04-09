@@ -1,8 +1,3 @@
-/**
- * Namespace for datascource-node
- * @namespace datasource
- */
-
 class QueryBuilder {
   constructor(query) {
     this.query = query
@@ -134,12 +129,27 @@ class SearchParams {
   }
 }
 
+/**
+ * DataSource node integration
+ * @namespace dataSource
+ **/
 module.exports = {
   QueryBuilder: QueryBuilder,
+
+  /**
+   * @typedef {object} UpdatedData
+   * @property {object} changes
+   * @property {string} source
+   * */
   UpdatedData: UpdatedData,
+  /** @class */
   CreatedRow: CreatedRow,
+  /** @class */
   RowMoved: RowMoved,
+  /** @class */
   CreatedColumn: CreatedColumn,
+  /** @class */
   ColumnMoved: ColumnMoved,
+  /** @class */
   SearchParams: SearchParams,
 }
