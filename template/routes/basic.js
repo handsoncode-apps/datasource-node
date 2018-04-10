@@ -21,11 +21,11 @@ router.post("/update", jsonParser, function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createRow:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/create/row", jsonParser, function (req, res, next) {
+router.put("/row", jsonParser, function (req, res, next) {
   // TODO: new row action
 });
 
-router.post("/remove/row", jsonParser, function(req, res, next) {
+router.delete("/row", jsonParser, function(req, res, next) {
   // TODO: remove row action
   res.json({ data: "ok" });
 })
@@ -34,7 +34,7 @@ router.post("/remove/row", jsonParser, function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{rowMove:{rowsMoved:array,target:number}}} req.body
  */
-router.post("/move/row", jsonParser, function(req, res, next) {
+router.post("/row/move", jsonParser, function(req, res, next) {
   // TODO: move row action
   res.json({data:'ok'});
 })
@@ -43,7 +43,7 @@ router.post("/move/row", jsonParser, function(req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{createCol:{index:number,amount:number,source:string}}} req.body
  */
-router.post("/create/column", jsonParser, function (req, res, next) {
+router.put("/column", jsonParser, function (req, res, next) {
   // TODO: create new row action
 });
 
@@ -59,7 +59,7 @@ router.post("/data", jsonParser, function (req, res, next) {
  * @param {{e.RequestHandler}} jsonParser
  * @param {{tmp:{columns:array,target:number}}} req.body
  */
-router.post("/move/column", jsonParser, function (req, res, next) {
+router.post("/column/move", jsonParser, function (req, res, next) {
   let colOrder = []
 
   // TODO: columns order action
@@ -72,12 +72,20 @@ router.get("/settings", jsonParser, function (req, res, next) {
   res.json({ data: settings });
 });
 
-router.get("/", function(req, res){
-  res.render('basic')
+router.delete("/column", jsonParser, function (req, res, next) {
+  // TODO: remove column(s) action
 });
 
-router.post("/remove/column", jsonParser, function (req, res, next) {
-  // TODO: remove column(s) action
-})
+router.post("/cell/meta", jsonParser, function (req, res, next) {
+  // TODO: cell meta change action
+});
+
+router.post("/cell/merge", jsonParser, function (req, res, next) {
+  // TODO: cell merge action
+});
+
+router.post("/cell/unmerge", jsonParser, function (req, res, next) {
+  // TODO: cell merge action
+});
 
 module.exports = router;
