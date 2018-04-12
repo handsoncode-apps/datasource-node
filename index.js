@@ -73,8 +73,6 @@ class QueryBuilder {
       return ' ORDER BY sort_order '
     }
 
-    console.log(this.query);
-
     let dbQuery = ''
     if (this.query.order.order === 'ASC') {
       dbQuery += ' ORDER BY `' + this.query.order.column + '` ASC'
@@ -129,6 +127,34 @@ class SearchParams {
   }
 }
 
+class ResizedColumn {
+  constructor() {
+    this.column = '',
+    this.size = 0
+  }
+}
+
+class RowResized {
+  constructor() {
+    this.row = 0,
+    this.size = 0
+  }
+}
+
+class MergedCells {
+  constructor() {
+    this.mergedParent = {},
+    this.mergedCells = []
+  }
+}
+
+class UnmergedCells {
+  constructor() {
+    this.mergedParent = {},
+    this.mergedCells = []
+  }
+}
+
 /**
  * DataSource node integration
  * @namespace dataSource
@@ -147,9 +173,17 @@ module.exports = {
   /** @class */
   RowMoved: RowMoved,
   /** @class */
+  RowResized: RowResized,
+  /** @class */
   CreatedColumn: CreatedColumn,
   /** @class */
   ColumnMoved: ColumnMoved,
+  /** @class */
+  ResizedColumn: ResizedColumn,
+  /** @class */
+  MergedCells: MergedCells,
+  /** @class */
+  UnmergedCells: UnmergedCells,
   /** @class */
   SearchParams: SearchParams,
 }
