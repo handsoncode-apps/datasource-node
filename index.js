@@ -69,17 +69,17 @@ class QueryBuilder {
   }
 
   _buildOrderClause() {
-    if (!this.query.hasOwnProperty('order') || this.query.order === undefined || this.query.order === {}) {
+    if (!this.query.hasOwnProperty('sort') || this.query.sort === undefined || this.query.sort === {}) {
       return ' ORDER BY sort_order '
     }
 
     console.log(this.query);
 
     let dbQuery = ''
-    if (this.query.order.order === 'ASC') {
-      dbQuery += ' ORDER BY `' + this.query.order.column + '` ASC'
-    } else if (this.query.order === 'DESC') {
-      dbQuery += ' ORDER BY `' + this.query.order.column + '` DESC'
+    if (this.query.sort.order === 'ASC') {
+      dbQuery += ' ORDER BY `' + this.query.sort.column + '` ASC'
+    } else if (this.query.sort === 'DESC') {
+      dbQuery += ' ORDER BY `' + this.query.sort.column + '` DESC'
     }
     return dbQuery
   }
