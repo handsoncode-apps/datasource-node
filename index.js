@@ -11,8 +11,8 @@ class QueryBuilder {
   }
 
   _byValueCondition(columnName, arg) {
-    var inValues = []
-    for (var propertyName in arg) {
+    let inValues = []
+    for (let propertyName in arg) {
       inValues.push('"' + arg[propertyName] + '"')
     }
     return columnName + ' IN (' + inValues.join(', ') + ')'
@@ -47,11 +47,11 @@ class QueryBuilder {
     if (!this.query.hasOwnProperty('filters')) {
       return '';
     }
-    var conditionArray = []
+    let conditionArray = []
     this.query.filters.forEach(column => {
       if (column.hasOwnProperty('conditions')) {
         column.conditions.forEach(condition => {
-          var generatedCondition = this._getSQLClause(column.column, condition)
+          let generatedCondition = this._getSQLClause(column.column, condition)
           if (generatedCondition !== '') {
             conditionArray.push(generatedCondition)
           }

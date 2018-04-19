@@ -5,7 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const replace = require('stream-replace');
 
-var generate = (name) => {
+let generate = (name) => {
   let source = path.resolve(path.join(__dirname,'..','template','routes'));
   let target = path.resolve(path.join('.','routes'));
 
@@ -28,8 +28,8 @@ var generate = (name) => {
     .pipe(replace(/basic/g, name))
     .pipe(fs.createWriteStream(path.format({dir:target, base: name + '.pug'})))
 
-  console.log('\nAssuming that var app = express() add those two lines to your app.js (server) file:')
-  console.log("\tvar " + name + " = require('./routes/" + name + "')")
+  console.log('\nAssuming that const app = express() add those two lines to your app.js (server) file:')
+  console.log("\tconst " + name + " = require('./routes/" + name + "')")
   console.log("\tapp.use('/" + name  + "'," + name + ")")
 }
 

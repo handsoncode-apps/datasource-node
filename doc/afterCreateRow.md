@@ -4,7 +4,7 @@ You need to create method that will catch the POST "/aftercreaterow" url with bo
 
 ```javascript
 router.post('/create/row', jsonParser, function (req, res, next) {
-  var createRow = req.body
+  let createRow = req.body
 
   // TODO  insert implementation here
   res.json({'data': 'ok'})

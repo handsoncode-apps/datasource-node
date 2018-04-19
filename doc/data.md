@@ -39,8 +39,8 @@ You can filter passed data by columns and get object that is an array of objects
 ```javascript
 router.get('/data', function (req, res, next) {
   // save filters for usage
-  var filters = req.body.filters
-  var conditions = req.body.conditions
+  let filters = req.body.filters
+  let conditions = req.body.conditions
   // TODO implement your code here
   res.json(data)
 })
@@ -104,7 +104,7 @@ You can sort passed data by columns and get object handling information about so
 ```javascript
 router.get('/data', function (req, res, next) {
   // save columns and order for usage
-  var order = req.body.order
+  let order = req.body.order
   res.json(data)
 })
 ```
