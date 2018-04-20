@@ -29,6 +29,16 @@ let generate = (name) => {
     .pipe(replace(/basic/g, name))
     .pipe(fs.createWriteStream(path.format({dir:target, base: name + '.pug'})))
 
+  if (program.assets) {
+    source = path.resolve(path.join(__dirname, '..', 'example', 'public', 'js'))
+    target = path.resolve(path.join(__dirname, '..', program.assets))
+    if (!fs.existsSync(target)) {
+      fs.mkdirSync(target)
+    }
+    fs.createReadStream(path.format({dir: source, base: 'datasource-connector.js'}))
+      .pipe(fs.createWriteStream(path.format({dir: target, base: 'datasource-connector.js'})))
+  }
+
   console.log(chalk.yellow('\nAssuming that const app = express() add those two lines to your app.js (server) file:'))
   console.log(chalk.yellow("\tconst " + name + " = require('./routes/" + name + "');"))
   console.log(chalk.yellow("\tapp.use('/" + name  + "', " + name + ");\n"))
@@ -38,6 +48,7 @@ const program = require('commander')
 program
   .version('0.0.1')
   .arguments('<name>')
+  .option('--assets [assets]', 'Directory for assets')
   .description('Generate hot datasource-connector style controller and pug view for express js\n  <name> - name of controller & view')
   .action(generate)
 
