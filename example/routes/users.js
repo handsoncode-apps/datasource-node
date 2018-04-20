@@ -87,7 +87,7 @@ var db = new sqlite3.Database("./database.db", function (data) {
       }
     })
   })
-  
+
   // initialize row order
   db.serialize(function() {
     db.all("SELECT * FROM `rowOrder` LIMIT 1", (err, rows) => {

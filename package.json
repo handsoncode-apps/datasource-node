@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "lint": "eslint --rule \"no-restricted-globals: 0\" index.js index.d.ts"
+    "lint": "eslint --rule \"no-restricted-globals: 0\" ."
   },
   "author": "",
   "bin": {
