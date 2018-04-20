@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const replace = require('stream-replace');
 const chalk = require('chalk');
+const copydir = require('copy-dir');
 
 let generate = (name) => {
   let source = path.resolve(path.join(__dirname,'..','template','routes'));
@@ -30,13 +31,12 @@ let generate = (name) => {
     .pipe(fs.createWriteStream(path.format({dir:target, base: name + '.pug'})))
 
   if (program.assets) {
-    source = path.resolve(path.join(__dirname, '..', 'example', 'public', 'js'))
+    source = path.resolve(path.join(__dirname, '..', 'example', 'public'))
     target = path.resolve(path.join(__dirname, '..', program.assets))
     if (!fs.existsSync(target)) {
       fs.mkdirSync(target)
     }
-    fs.createReadStream(path.format({dir: source, base: 'datasource-connector.js'}))
-      .pipe(fs.createWriteStream(path.format({dir: target, base: 'datasource-connector.js'})))
+    copydir.sync(source, target)
   }
 
   console.log(chalk.yellow('\nAssuming that const app = express() add those two lines to your app.js (server) file:'))
