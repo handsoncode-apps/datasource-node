@@ -34,9 +34,31 @@ let generate = (name) => {
         .pipe(fs.createWriteStream(path.format({dir:target, base: name + '.pug'})))
     }
   
+    if (program.engine === "manual") {
+      console.log(chalk.yellow("\nSetup\
+        \nEmbed this code inside your HTML file:"));
+      console.log(chalk.green("\t<script src=\"handsontable.full.js\"></script>\
+        \n\t<script src=\"dataSourceConnectorPlugin.js\"></script>\
+        \n\t<link rel=\"stylesheet\" media=\"screen\" href=\"/dist/handsontable.full.css\">"));
+      console.log(chalk.yellow("\nSpreadsheet container\
+        \nAdd an empty <div> element that will be turned into a spreadsheet. Let's give this element an \"container\" ID"));
+      console.log(chalk.green("\t<div id=\"container\"></div>"));
+      console.log(chalk.yellow("\nInitialize\
+        \nIn the next step, pass a reference to that `<div class=\"container\">` and setup yor backend controller url by passing into controllerUrl option."));
+      console.log(chalk.green("\tvar container = document.getElementById('container');\
+        \n\tvar hot = new Handsontable(container, {\
+        \n\t\trowHeaders: true,\
+        \n\t\tcolHeaders: true,\
+        \n\t\tdatasourceConnector: {\
+        \n\t\t\tcontrollerUrl: 'http://yourdomain.com/controller',\
+        \n\t\t\trequestHeaders: { 'Content-Type': 'application/json' }\
+        \n\t\t}\
+        \n\t});"));
+    }
+
     console.log(chalk.yellow('\nAssuming that const app = express() add those two lines to your app.js (server) file:'))
-    console.log(chalk.yellow("\tconst " + name + " = require('./routes/" + name + "');"))
-    console.log(chalk.yellow("\tapp.use('/" + name  + "', " + name + ");\n"))
+    console.log(chalk.green("\tconst " + name + " = require('./routes/" + name + "');"))
+    console.log(chalk.green("\tapp.use('/" + name  + "', " + name + ");"))
   } else {
     console.log(chalk.red("Flag --engine=manual|pug is required."))
   }
