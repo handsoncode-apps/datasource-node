@@ -4,6 +4,8 @@ const { exec } = require('child_process')
 const fs = require('fs')
 const rimraf = require('rimraf')
 const path = require('path')
+const chai = require('chai');
+chai.should();
 
 const request = require('request')
 
@@ -41,7 +43,7 @@ var npmInstall = function(path, resolve, reject) {
 }
 
 var runGenerator = function(resolve, reject) {
-  exec('sh ./test/generate.sh ' + projectName, function(error, stdout, stderr) {
+  exec('node ../bin/index.js --engine pug test', { cwd: path.resolve(__dirname,'..', projectName)}, function(error, stdout, stderr) {
     if (error) {
       reject(error)
     } else {
@@ -132,7 +134,6 @@ before(function(done) {
     const app = require('../' + projectName + '/app');
     server = app.listen(3000, done)
   })
-
 })
 
 describe('/test/data', function () {
@@ -154,12 +155,12 @@ describe('/test/data', function () {
     })
   })
 })
-describe('/test/move/column', function () {
+describe('/test/column/move', function () {
   describe('POST', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/move/column',
+        url: baseURL + '/test/column/move',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -192,13 +193,13 @@ describe('/test/settings', function () {
     })
   })
 })
-describe('/test/create/column', function () {
-  describe('POST', function () {
+describe('/test/column', function () {
+  describe('PUT', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/create/column',
-        method: 'POST',
+        url: baseURL + '/test/column',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -211,13 +212,13 @@ describe('/test/create/column', function () {
     })
   })
 })
-describe('/test/create/row', function () {
-  describe('POST', function () {
+describe('/test/row', function () {
+  describe('PUT', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/create/row',
-        method: 'POST',
+        url: baseURL + '/test/row',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         }
@@ -230,12 +231,12 @@ describe('/test/create/row', function () {
     })
   })
 })
-describe('/test/update', function () {
+describe('/test/cell', function () {
   describe('POST', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/update',
+        url: baseURL + '/test/cell',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -251,8 +252,8 @@ describe('/test/update', function () {
 })
 
 after(done => {
-  server.close()
-  removeProject(done)
+  server.close();
+  removeProject(done);
 })
 
 
