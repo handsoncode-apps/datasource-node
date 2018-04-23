@@ -30,6 +30,11 @@ export declare namespace DataSourceConnector {
     public sort : Array<any>;
     public filter : Array<any>;
   }
+
+  class CellMeta {
+    public row: number;
+    public column: string;
+  }
 }
 
 declare class Order {
