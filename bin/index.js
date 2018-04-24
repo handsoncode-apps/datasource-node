@@ -85,7 +85,7 @@ let generate = (name) => {
       console.log(chalk.green("\t\tvar container = document.getElementById('container');\
         \n\t\tvar hot = new Handsontable(container, {\
         \n\t\t\tdatasourceConnector: {\
-        \n\t\t\t\tcontrollerUrl: 'http://yourdomain.com/" + name + "\
+        \n\t\t\t\tcontrollerUrl: 'http://yourdomain.com/" + name + "'\
         \n\t\t\t}\
         \n\t\t});\n\n"));
     }
@@ -93,7 +93,12 @@ let generate = (name) => {
     console.log('\nAssuming that const app = express() add those two lines to your app.js (server) file:')
     console.log(chalk.green("\tconst " + name + " = require('./routes/" + name + "');"))
     console.log(chalk.green("\tapp.use('/" + name  + "', " + name + ");"))
+    if (program.assets) {
+      console.log(chalk.green("\tapp.use(express.static('" + program.assets + "'));"))
+    }
+
     console.log(chalk.yellow("\n\nAll work DONE!"));
+
   } else {
     console.log(chalk.red("Flag --engine <manual|pug> is required."))
   }

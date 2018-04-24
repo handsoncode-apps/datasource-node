@@ -9,3 +9,5 @@ example/node_modules/
 /npm-debug.log
 /test/node_modules
 /test/testapp
+
+template/package-lock.json
