@@ -76,7 +76,7 @@ class QueryBuilder {
     let dbQuery = ''
     if (this.query.sort.order === 'ASC') {
       dbQuery += ' ORDER BY `' + this.query.sort.column + '` ASC'
-    } else if (this.query.sort === 'DESC') {
+    } else if (this.query.sort.order === 'DESC') {
       dbQuery += ' ORDER BY `' + this.query.sort.column + '` DESC'
     }
     return dbQuery
