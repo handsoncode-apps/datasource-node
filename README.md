@@ -10,6 +10,9 @@ $ npm i handsoncode-apps/datasource-node -g
 ```
 ## Usage 
 ### Generate express js router and pug view
+
+To use pug view engine please follow this [link](https://expressjs.com/en/guide/using-template-engines.html), then 
+
 ```bash
 $ cd expressjs_project
 $ datasource-node-generator [controller_name] --engine pug
