@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "lint": "eslint index.js test/ bin/ "
+    "lint": "eslint index.js bin/ "
   },
   "author": "",
   "bin": {
@@ -14,14 +14,14 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.14.1",
-    "stream-replace": "^1.0.0"
+    "stream-replace": "^1.0.0",
+    "chalk": "^2.4.0",
+    "copy-dir": "^0.3.0"
   },
   "devDependencies": {
     "@ljharb/eslint-config": "^12.2.1",
     "babel-eslint": "^8.2.3",
     "chai": "^4.1.2",
-    "chalk": "^2.4.0",
-    "copy-dir": "^0.3.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.11.0",

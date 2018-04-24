@@ -11,3 +11,4 @@ example/node_modules/
 /test/testapp
 
 template/package-lock.json
+package-lock.json

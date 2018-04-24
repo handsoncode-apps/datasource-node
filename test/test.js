@@ -1,310 +1,324 @@
 /* eslint-env mocha */
-'use strict'
-const { exec } = require('child_process')
-const fs = require('fs')
-const rimraf = require('rimraf')
-const path = require('path')
+
+const { exec } = require('child_process');
+const fs = require('fs');
+const rimraf = require('rimraf');
+const path = require('path');
 const chai = require('chai');
+
 chai.should();
 
-const request = require('request')
+const request = require('request');
 
-const projectName = 'testapp'
+const projectName = 'testapp';
 
-var baseURL = 'http://localhost:3000'
+var baseURL = 'http://localhost:3000';
 
 var generateProject = function() {
-  return new Promise( (resolve, reject) => {
-    console.log('generating project')
-    var cmd = 'express --view=pug ' +  projectName
+  return new Promise((resolve, reject) => {
+    // eslint-disable-next-line no-console
+    console.log('generating project');
+    var cmd = `express --view=pug ${projectName}`;
 
-    exec(cmd, function(error, stdout, stderr) {
+    exec(cmd, (error) => {
       if (error) {
-        reject(error)
+        reject(error);
       } else {
-        npmInstall('./' +  projectName, resolve, reject)
+        npmInstall(`./${projectName}`, resolve, reject);
       }
-    })
-  })
-}
+    });
+  });
+};
 
-var npmInstall = function(path, resolve, reject) {
-  console.log('Running npm install...')
-  var cmd = 'npm --prefix ' + path + ' install ' + path
-  exec(cmd, function(error, stdout, stderr) {
+var npmInstall = function(dir, resolve, reject) {
+  // eslint-disable-next-line no-console
+  console.log('Running npm install...');
+  var cmd = `npm --prefix ${dir} install ${dir}`;
+  exec(cmd, (error) => {
     if (error) {
-      reject(error)
+      reject(error);
     } else {
-      runGenerator(resolve, reject)
+      runGenerator(resolve, reject);
     }
-  })
-}
+  });
+};
 
 var runGenerator = function(resolve, reject) {
-  exec('node ../bin/index.js --engine pug test', { cwd: path.resolve(__dirname,'..', projectName)}, function(error, stdout, stderr) {
+  exec('node ../bin/index.js --engine pug test', { cwd: path.resolve(__dirname, '..', projectName)}, (error, stdout) => {
     if (error) {
-      reject(error)
+      reject(error);
     } else {
-      insertLines(stdout, resolve, reject)
+      insertLines(stdout, resolve, reject);
     }
-  })
-}
+  });
+};
 
 var removeProject = function(callback) {
-  rimraf('./' + projectName, function (error) {
+  rimraf(`./${projectName}`, (error) => {
     if (error) {
-      var warningMessage = error.code + '. Cannot remove test project ' + projectName
+      var warningMessage = `${error.code}. Cannot remove test project ${projectName}`;
       if (error.code === 'EPERM') {
-        warningMessage += '. Operation not permitted.'
+        warningMessage += '. Operation not permitted.';
       }
       if (error.code === 'EBUSY' || error.code === 'ENOTEMPTY') {
-        warningMessage += '. Resource busy or locked'
+        warningMessage += '. Resource busy or locked';
       }
       if (error.code === 'ENOENT') {
-        warningMessage += '. File does not exist.'
+        warningMessage += '. File does not exist.';
       }
-      reject(warningMessage)
-      process.exit(-1)
-    } else {
-      console.log('Test project is removed')
-      if (callback) {
-        return callback()
-      }
+      reject(warningMessage);
+      return process.exit(-1);
     }
-  })
-}
+    // eslint-disable-next-line no-console
+    console.log('Test project is removed');
+    return callback();
+  });
+};
 
-var getLineToInsert = function(stdout) {
-  return "\nconst test = require('./routes/test');\n"+
-            "app.use('/test',test);\n";
-}
+var getLineToInsert = function() {
+  return '\nconst test = require(\'./routes/test\');\n' +
+            'app.use(\'/test\',test);\n';
+};
 
 var insertLines = function(stdout, resolve, reject) {
-  var partToInsert = getLineToInsert(stdout)
-  var content = 'var app = express();'
-  var appJsPath = path.join('.', projectName, 'app.js')
+  var partToInsert = getLineToInsert();
+  var content = 'var app = express();';
+  var appJsPath = path.join('.', projectName, 'app.js');
 
-  fs.readFile(appJsPath, 'utf8', function(err, data) {
-    if (err) {
-      reject(err)
+  fs.readFile(appJsPath, 'utf8', (errorRead, data) => {
+    if (errorRead) {
+      reject(errorRead);
     }
-    var result = data.replace("var app = express();", content + partToInsert)
+    var result = data.replace('var app = express();', content + partToInsert);
 
-    fs.writeFile(appJsPath, result, 'utf8', function(err) {
-      if (err) {
-        reject(err)
+    fs.writeFile(appJsPath, result, 'utf8', (errorWrite) => {
+      if (errorWrite) {
+        reject(errorWrite);
       } else {
-        replaceInFile(resolve, reject)
+        replaceInFile(resolve, reject);
       }
-    })
-  })
-}
+    });
+  });
+};
 
 var replaceInFile = function(resolve, reject, callback) {
-  fs.readFile(path.join('.', projectName, 'routes', 'test.js'), 'utf8', function(err, data) {
+  fs.readFile(path.join('.', projectName, 'routes', 'test.js'), 'utf8', (err, data) => {
     if (err) {
-      reject(err)
+      reject(err);
     }
-    var result = data.replace(/\/\/ TODO:([^{]+?)}/g, "res.json({ data: 'ok' }) \}\) //")
+    var result = data.replace(/\/\/ TODO:([^{]+?)}/g, 'res.json({ data: \'ok\' }) }); //');
 
-    fs.writeFile(path.join('.', projectName, 'routes', 'test.js'), result, 'utf8', function(err) {
-      if (err) {
-        reject(err)
+    fs.writeFile(path.join('.', projectName, 'routes', 'test.js'), result, 'utf8', (errorWrite) => {
+      if (errorWrite) {
+        reject(errorWrite);
+      } else if (callback) {
+        callback();
       } else {
-        if (callback) {
-          callback()
-        } else {
-          resolve()
-        }
+        resolve();
       }
-    })
-  })
-}
-
+    });
+  });
+};
 
 let server;
 before(function(done) {
-  this.timeout(120000)
+  this.timeout(120000);
   generateProject().then(() => {
-    const app = require('../' + projectName + '/app');
-    server = app.listen(3000, done)
-  })
-})
+    // eslint-disable-next-line
+    const app = require(`../${projectName}/app`);
+    server = app.listen(3000, done);
+  });
+});
 
-describe('/test/data', function () {
-  describe('POST', function () {
+describe('/test/data', () => {
+  describe('POST', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(10000)
-      request({
-        url: baseURL + '/test/data',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(10000);
+      request(
+        {
+          url: `${baseURL}/test/data`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/column/move', function () {
-  describe('POST', function () {
+      );
+    });
+  });
+});
+describe('/test/column/move', () => {
+  describe('POST', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/column/move',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/column/move`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/settings', function () {
-  describe('GET', function () {
+      );
+    });
+  });
+});
+describe('/test/settings', () => {
+  describe('GET', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/settings',
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/settings`,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
+      );
+    });
+  });
+});
 
-describe('/test/column', function () {
-  describe('DELETE', function () {
+describe('/test/column', () => {
+  describe('DELETE', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/column',
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/column`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-  describe('PUT', function () {
+      );
+    });
+  });
+  describe('PUT', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/column',
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/column`,
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/row', function () {
-  describe('DELETE', function () {
+      );
+    });
+  });
+});
+describe('/test/row', () => {
+  describe('DELETE', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/row',
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/row`,
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-  describe('PUT', function () {
+      );
+    });
+  });
+  describe('PUT', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/row',
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/row`,
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/cell', function () {
-  describe('POST', function () {
+      );
+    });
+  });
+});
+describe('/test/cell', () => {
+  describe('POST', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/cell',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/cell`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/cell/meta', function () {
-  describe('POST', function () {
+      );
+    });
+  });
+});
+describe('/test/cell/meta', () => {
+  describe('POST', () => {
     it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/cell/meta',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      this.timeout(5000);
+      request(
+        {
+          url: `${baseURL}/test/cell/meta`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        },
+        (error, res) => {
+          if (error) { return done(error); }
+          res.statusCode.should.not.equal(404);
+          done();
         }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
+      );
+    });
+  });
+});
 
-after(done => {
+after((done) => {
   server.close();
   removeProject(done);
-})
-
-
-
+});
 
