@@ -84,7 +84,7 @@ let generate = (name) => {
       console.log("\tplugin initialization:");
       console.log(chalk.green("\t\tvar container = document.getElementById('container');\
         \n\t\tvar hot = new Handsontable(container, {\
-        \n\t\t\tdatasourceConnector: {\
+        \n\t\t\tdataSourceConnector: {\
         \n\t\t\t\tcontrollerUrl: 'http://yourdomain.com/" + name + "'\
         \n\t\t\t}\
         \n\t\t});\n\n"));
