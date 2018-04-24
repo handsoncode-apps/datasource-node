@@ -1,6 +1,5 @@
 #! /usr/bin/env node
 /* eslint-disable no-console */
-
 const path = require('path');
 const fs = require('fs');
 const replace = require('stream-replace');
@@ -9,6 +8,7 @@ const program = require('commander');
 const {execSync} = require('child_process');
 const copydir = require('copy-dir');
 const packageJSON = require('../package.json');
+
 let removeFolderSync = (dir) => {
   if (fs.existsSync(dir)) {
     fs.readdirSync(dir).forEach((file) => {
