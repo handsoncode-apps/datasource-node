@@ -15,20 +15,14 @@ block content
     
     var hot = new Handsontable(container, {
         dataSourceConnector: {
-          controllerUrl: '/basic',
-          onDataSend : function(data){
-            var element = document.getElementById("log");
-            var newRow = document.createElement("tr")
-            newRow.innerHTML="<td>" + data.request.method + "</td><td>" + data.request.url + "</td><td>" + data.request.body + "</td><td>" + JSON.stringify(data.response) + "</td>";
-            element.insertBefore(newRow, element.firstChild);
-          }
+          controllerUrl: '/basic'
         },
     });
 block scripts
-  script(src='https://docs.handsontable.com/pro/1.18.0/bower_components/handsontable-pro/dist/handsontable.full.js')
+  script(src='/js/handsontable.full.js')
   script(src='/js/datasource-connector.full.js')
   
 block css
-  link(rel='stylesheet', href='https://docs.handsontable.com/pro/1.18.0/bower_components/handsontable-pro/dist/handsontable.min.css')
+  link(rel='stylesheet', href='/css/handsontable.min.css')
 
 

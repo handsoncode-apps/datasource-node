@@ -12,7 +12,7 @@ const jsonParser = bodyParser.json();
  * @param {{e.RequestHandler}} jsonParser
  * @param {{changes:[{row:number,column:number,newValue:string,meta:{row:number,col:number,visualRow:number,visualCol:number,prop:number,row_id:number,col_id:any}}], source:String}} req.body
  */
-router.post("/update", jsonParser, function (req, res, next) {
+router.post("/cell", jsonParser, function (req, res, next) {
   //TODO: cell update(s) action
   res.json({ data: "ok" });
 });

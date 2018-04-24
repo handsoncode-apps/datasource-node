@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "lint": "eslint --rule \"no-restricted-globals: 0\" ."
+    "lint": "eslint index.js test/ bin/ "
   },
   "author": "",
   "bin": {
@@ -13,9 +13,7 @@
   },
   "license": "ISC",
   "dependencies": {
-    "chai": "^4.1.2",
     "commander": "^2.14.1",
-    "mocha": "^5.0.5",
     "stream-replace": "^1.0.0"
   },
   "devDependencies": {
@@ -23,7 +21,13 @@
     "babel-eslint": "^8.2.3",
     "chai": "^4.1.2",
     "chalk": "^2.4.0",
+    "copy-dir": "^0.3.0",
     "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "mocha": "^5.0.5",
+    "request": "^2.85.0",
+    "typescript": "^2.8.3",
     "typescript-eslint-parser": "^15.0.0"
   }
 }

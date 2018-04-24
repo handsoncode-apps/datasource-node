@@ -4,6 +4,8 @@ const { exec } = require('child_process')
 const fs = require('fs')
 const rimraf = require('rimraf')
 const path = require('path')
+const chai = require('chai');
+chai.should();
 
 const request = require('request')
 
@@ -20,7 +22,6 @@ var generateProject = function() {
       if (error) {
         reject(error)
       } else {
-        console.log(stdout, stderr)
         npmInstall('./' +  projectName, resolve, reject)
       }
     })
@@ -34,18 +35,16 @@ var npmInstall = function(path, resolve, reject) {
     if (error) {
       reject(error)
     } else {
-      console.log(stdout, stderr)
       runGenerator(resolve, reject)
     }
   })
 }
 
 var runGenerator = function(resolve, reject) {
-  exec('sh ./test/generate.sh ' + projectName, function(error, stdout, stderr) {
+  exec('node ../bin/index.js --engine pug test', { cwd: path.resolve(__dirname,'..', projectName)}, function(error, stdout, stderr) {
     if (error) {
       reject(error)
     } else {
-      console.log(stdout, stderr)
       insertLines(stdout, resolve, reject)
     }
   })
@@ -76,8 +75,8 @@ var removeProject = function(callback) {
 }
 
 var getLineToInsert = function(stdout) {
-  var splited = stdout.trim().split("\n");
-  return '\n' + splited[splited.length - 2].trim() + '\n' + splited[splited.length - 1].trim()
+  return "\nconst test = require('./routes/test');\n"+
+            "app.use('/test',test);\n";
 }
 
 var insertLines = function(stdout, resolve, reject) {
@@ -106,8 +105,7 @@ var replaceInFile = function(resolve, reject, callback) {
     if (err) {
       reject(err)
     }
-    var result = data.replace(/\/\/ TODO:(.*?)/g, "res.json({ data: 'ok' }) //")
-    console.log(result)
+    var result = data.replace(/\/\/ TODO:([^{]+?)}/g, "res.json({ data: 'ok' }) \}\) //")
 
     fs.writeFile(path.join('.', projectName, 'routes', 'test.js'), result, 'utf8', function(err) {
       if (err) {
@@ -116,7 +114,6 @@ var replaceInFile = function(resolve, reject, callback) {
         if (callback) {
           callback()
         } else {
-          console.log('resolve')
           resolve()
         }
       }
@@ -132,7 +129,6 @@ before(function(done) {
     const app = require('../' + projectName + '/app');
     server = app.listen(3000, done)
   })
-
 })
 
 describe('/test/data', function () {
@@ -154,12 +150,12 @@ describe('/test/data', function () {
     })
   })
 })
-describe('/test/move/column', function () {
+describe('/test/column/move', function () {
   describe('POST', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/move/column',
+        url: baseURL + '/test/column/move',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -192,12 +188,85 @@ describe('/test/settings', function () {
     })
   })
 })
-describe('/test/create/column', function () {
+
+describe('/test/column', function () {
+  describe('DELETE', function () {
+    it('should not return 404 status code', function (done) {
+      this.timeout(5000)
+      request({
+        url: baseURL + '/test/column',
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      function (error, res, body) {
+        if (error) return done(error)
+        res.statusCode.should.not.equal(404)
+        done()
+      })
+    })
+  })
+  describe('PUT', function () {
+    it('should not return 404 status code', function (done) {
+      this.timeout(5000)
+      request({
+        url: baseURL + '/test/column',
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      function (error, res, body) {
+        if (error) return done(error)
+        res.statusCode.should.not.equal(404)
+        done()
+      })
+    })
+  })
+})
+describe('/test/row', function () {
+  describe('DELETE', function () {
+    it('should not return 404 status code', function (done) {
+      this.timeout(5000)
+      request({
+        url: baseURL + '/test/row',
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      function (error, res, body) {
+        if (error) return done(error)
+        res.statusCode.should.not.equal(404)
+        done()
+      })
+    })
+  })
+  describe('PUT', function () {
+    it('should not return 404 status code', function (done) {
+      this.timeout(5000)
+      request({
+        url: baseURL + '/test/row',
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      },
+      function (error, res, body) {
+        if (error) return done(error)
+        res.statusCode.should.not.equal(404)
+        done()
+      })
+    })
+  })
+})
+describe('/test/cell', function () {
   describe('POST', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/create/column',
+        url: baseURL + '/test/cell',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -211,31 +280,12 @@ describe('/test/create/column', function () {
     })
   })
 })
-describe('/test/create/row', function () {
+describe('/test/cell/meta', function () {
   describe('POST', function () {
     it('should not return 404 status code', function (done) {
       this.timeout(5000)
       request({
-        url: baseURL + '/test/create/row',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      },
-      function (error, res, body) {
-        if (error) return done(error)
-        res.statusCode.should.not.equal(404)
-        done()
-      })
-    })
-  })
-})
-describe('/test/update', function () {
-  describe('POST', function () {
-    it('should not return 404 status code', function (done) {
-      this.timeout(5000)
-      request({
-        url: baseURL + '/test/update',
+        url: baseURL + '/test/cell/meta',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -251,8 +301,8 @@ describe('/test/update', function () {
 })
 
 after(done => {
-  server.close()
-  removeProject(done)
+  server.close();
+  removeProject(done);
 })
 
 
