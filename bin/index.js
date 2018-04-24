@@ -8,7 +8,7 @@ const chalk = require('chalk');
 const program = require('commander');
 const execSync = require('child_process').execSync;
 const copydir = require('copy-dir');
-
+const packageJSON = require('../package.json');
 
 let removeFolderSync = (path) => {
   if (fs.existsSync(path)) {
@@ -106,7 +106,7 @@ let generate = (name) => {
 }
 
 program
-  .version('0.0.1')
+  .version(packageJSON.version)
   .arguments('<name>')
   .option('--engine <engine>', 'Datasource-connector engine', /^(manual|pug)$/i)
   .option('--assets <path>', 'The assets path')
