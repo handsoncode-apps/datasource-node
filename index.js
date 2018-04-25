@@ -1,24 +1,30 @@
 class QueryBuilder {
-  constructor(query) {
+  constructor(query, tablename) {
     this.query = query;
+    this.tablename = tablename ? `${tablename}.` : '';
   }
 
   _joinCondition(columnName, operator, arg) {
     return (arg === null || arg === undefined) ?
-      `\`${columnName}\` ${operator}`
+      `${columnName} ${operator}`
       :
-      `\`${columnName}\` ${operator} "${arg}"`;
+      `${columnName} ${operator} "${arg}"`;
   }
 
   _byValueCondition(columnName, arg) {
     let inValues = [];
-    Object.keys(args).forEach((key) => {
+    Object.keys(arg).forEach((key) => {
       inValues.push(`"${arg[key]}"`);
     });
     return `${columnName} IN (${inValues.join(', ')})`;
   }
 
+  _betweenCondition(columnName, operator, args) {
+    return `${columnName} ${operator} ${args[0]} AND ${args[2]}`;
+  }
+
   _getSQLClause(columnName, condition) {
+    columnName = this.tablename + columnName;
     switch (condition.name) {
       case 'eq':
         return this._joinCondition(columnName, '=', condition.args[0]);
@@ -38,6 +44,19 @@ class QueryBuilder {
         return this._joinCondition(columnName, 'NOT LIKE', `%${condition.args[0]}%`);
       case 'by_value':
         return this._byValueCondition(columnName, condition.args[0]);
+      case 'gt':
+        return this._joinCondition(columnName, '>', Number(condition.args[0]));
+      case 'gte':
+        return this._joinCondition(columnName, '>=', `${condition.args[0]}`);
+      case 'lt':
+        return this._joinCondition(columnName, '<', `${condition.args[0]}`);
+      case 'lte':
+        return this._joinCondition(columnName, '<=', `${condition.args[0]}`);
+      case 'between':
+        return this._betweenCondition(columnName, 'BETWEEN', `${condition.args}`);
+      case 'not_between':
+        return this._betweenCondition(columnName, 'NOT BETWEEN', `${condition.args}`);
+
       default:
         return '';
     }
