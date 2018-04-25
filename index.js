@@ -83,8 +83,11 @@ class QueryBuilder {
     return '';
   }
 
-  buildQuery(sql) {
-    return sql + this._buildWhereClause() + this._buildOrderClause();
+  buildQuery(sql, order = true) {
+    if (order) {
+      return sql + this._buildWhereClause() + this._buildOrderClause();
+    }
+    return sql + this._buildWhereClause();
   }
 
   _buildOrderClause() {
