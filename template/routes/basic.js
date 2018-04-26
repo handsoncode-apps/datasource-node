@@ -88,4 +88,8 @@ router.post("/cell/unmerge", jsonParser, function (req, res, next) {
   // TODO: cell merge action
 });
 
+router.get('/', (req, res) => {
+  res.render('basic');
+});
+
 module.exports = router;
