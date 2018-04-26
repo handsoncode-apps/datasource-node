@@ -10,6 +10,7 @@ $ npm i handsoncode-apps/datasource-node -g
 ```
 ## Basic Usage 
 ### Generate new express js application with Handsontable spreadsheet 
+This example show how to create new express js application with Handsontable spreadsheet in 5 easy steps.
 
 1. Create express js app with pug view 
 
@@ -17,16 +18,17 @@ $ npm i handsoncode-apps/datasource-node -g
 $ npm install express-generator -g
 $ express --view=pug myapp
 ```
-1. Generate Handsontable controller and install corresponding pug view with communication plugin  
+
+2. Generate Handsontable controller and install corresponding pug view with communication plugin  
 ```bash
 $ cd myapp
 $ datasource-node myController --engine pug --assets private
 ```
-1. Install required packages
+
+3. Install required packages
 ```
 $ npm install
 ```
-
 The generator will create 2 files and download latest assets: 
 * route/myController.js - communication methods stub
 * view/myController.pug - frontend html view and handsontable initalization
@@ -35,7 +37,7 @@ The generator will create 2 files and download latest assets:
 * private/js/datasource-connector.full.js (handsontable data REST data source plugin)
 
 
-In next step you should add below lines to your app.js file
+4. In next step you should add below lines to your app.js file
 
 ```javascript
 const myController = require('./routes/myController');
@@ -43,7 +45,7 @@ app.use('/myController', myController);
 app.use(express.static('private'));
 ```        
 
-1. run server by execute command
+5. run server by execute command
 ```bash
 $ npm start
 ```
