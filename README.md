@@ -9,22 +9,31 @@ Steps to install this package
 $ npm i handsoncode-apps/datasource-node -g
 ```
 ## Basic Usage 
-### Generate express js router and pug view
+### Generate new express js application with Handsontable spreadsheet 
 
-Create express js app with pug view and static assets folllowing commands 
+1. Create express js app with pug view 
 
 ```bash
 $ npm install express-generator -g
 $ express --view=pug myapp
+```
+1. Generate Handsontable controller and install corresponding pug view with communication plugin  
+```bash
 $ cd myapp
 $ datasource-node myController --engine pug --assets private
+```
+1. Install required packages
+```
 $ npm install
 ```
-The generator will  create 2 files: 
-1. The route/myController.js with the methods stub
-2. The view/myController.pug with the html view
 
-and download the latest realised version of handsontable.min.css to css folder.
+The generator will create 2 files and download latest assets: 
+* route/myController.js - communication methods stub
+* view/myController.pug - frontend html view and handsontable initalization
+* private/css/handsontable.min.css (handsontable css)
+* private/js/handsontable.full.js (handsontable js)
+* private/js/datasource-connector.full.js (handsontable data REST data source plugin)
+
 
 In next step you should add below lines to your app.js file
 
@@ -33,6 +42,16 @@ const myController = require('./routes/myController');
 app.use('/myController', myController);
 app.use(express.static('private'));
 ```        
+
+1. run server by execute command
+```bash
+$ npm start
+```
+
+The generated project will be on:
+```
+http://localhost:3000/myController
+```
 
 ## Advanced usage
 ### Generate express js router only
