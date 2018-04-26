@@ -45,7 +45,7 @@ let generate = (name) => {
         fs.mkdirSync(target);
       }
 
-      if (!fs.existsSync(target + '/layout.pug')) {
+      if (!fs.existsSync(path.join(target, 'layout.pug'))) {
         fs.createReadStream(path.format({dir: source, base: 'layout.pug'}))
           .pipe(fs.createWriteStream(path.format({dir: target, base: 'layout.pug'})));
       }
