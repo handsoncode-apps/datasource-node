@@ -1,6 +1,6 @@
 # datasource-node
 Node.js data source generator for your Handsontable. Works great with datasource-connector plugin.
-This generator will generate the express js controller and view(pug) based on [communication specification](https://github.com/handsoncode-apps/datasource-connector/tree/master/doc#handsontable-datasource-communication)
+This generator will generate the express js route (controller) and view (pug) based on [communication specification](https://github.com/handsoncode-apps/datasource-connector/tree/master/doc#handsontable-datasource-communication)
 
 ## Installation
 Steps to install this package
@@ -36,8 +36,7 @@ The generator will create 2 files and download latest assets:
 * private/js/handsontable.full.js (handsontable js)
 * private/js/datasource-connector.full.js (handsontable data REST data source plugin)
 
-
-4. In next step you should add below lines to your app.js file
+4. Insert below lines to your app.js just after `var app = express();`
 
 ```javascript
 const myController = require('./routes/myController');
