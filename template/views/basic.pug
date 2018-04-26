@@ -1,6 +1,11 @@
-extends layout
-
-block content
+doctype html
+html
+  head
+    title=basic
+    link(rel='stylesheet', href='/css/handsontable.min.css')
+    script(src='/js/handsontable.full.js')
+    script(src='/js/datasource-connector.full.js')
+body
   h1 Example
   div(id="hot")
   script.
@@ -11,11 +16,6 @@ block content
           controllerUrl: '/basic'
         },
     });
-block scripts
-  script(src='/js/handsontable.full.js')
-  script(src='/js/datasource-connector.full.js')
-  
-block css
-  link(rel='stylesheet', href='/css/handsontable.min.css')
+
 
 
